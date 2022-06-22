@@ -40,6 +40,7 @@ jack_connect "ardour:Deck 4/audio_out 2" system:playback_2
 
 # Setup MIDI connections
 jack_connect "a2j:XONE:K2 [28] (capture): XONE:K2 MIDI 1" "ardour:MIDI Control In"
+jack_connect "a2j:XONE:K2 [28] (capture): XONE:K2 MIDI 1" "a2j:UMC204HD 192k [24] (playback): UMC204HD 192k MIDI 1"
 jack_connect "a2j:UMC204HD 192k [24] (capture): UMC204HD 192k MIDI 1" "ardour:MIDI Clock in"
-jack_connect "ardour:MIDI Clock out" "a2j:UMC204HD 192k [24] (playback): UMC204HD 192k MIDI 1"
+jack_connect "a2j:UMC204HD 192k [24] (capture): UMC204HD 192k MIDI 1" "a2j:UMC204HD 192k [24] (playback): UMC204HD 192k MIDI 1"
 

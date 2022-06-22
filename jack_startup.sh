@@ -3,7 +3,7 @@
 # Start a2jmidid to make ALSA midi devices available to JACK
 a2jmidid -e &
 
-# Exposes second sound card to JACK (I had better results with zita-ajbridge)
+# Exposes second sound card to JACK (I had better results with zita-ajbridge over alsa_out)
 # alsa_out -d hw:XONEK2 -c 4 -p 512 -r 48000 -j XONEk2 &
 zita-j2a -d hw:XONEK2 -c 4 -p 512 -r 48000 -j XONEK2 &
 
@@ -55,6 +55,7 @@ jack_connect "ardour:Deck 4/audio_out 2" system:playback_2
 
 # Setup MIDI connections
 jack_connect "a2j:XONE:K2 [28] (capture): XONE:K2 MIDI 1" "ardour:MIDI Control In"
+jack_connect "a2j:XONE:K2 [28] (capture): XONE:K2 MIDI 1" "a2j:UMC204HD 192k [24] (playback): UMC204HD 192k MIDI 1"
 jack_connect "a2j:UMC204HD 192k [24] (capture): UMC204HD 192k MIDI 1" "ardour:MIDI Clock in"
-jack_connect "ardour:MIDI Clock out" "a2j:UMC204HD 192k [24] (playback): UMC204HD 192k MIDI 1"
+jack_connect "a2j:UMC204HD 192k [24] (capture): UMC204HD 192k MIDI 1" "a2j:UMC204HD 192k [24] (playback): UMC204HD 192k MIDI 1"
 
