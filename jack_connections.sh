@@ -13,6 +13,10 @@ jack_disconnect Mixxx:out_4 "ardour:Deck 3/audio_in 1"
 jack_disconnect Mixxx:out_5 "ardour:Deck 3/audio_in 2"
 jack_disconnect Mixxx:out_6 "ardour:Deck 1/audio_in 1"
 jack_disconnect Mixxx:out_7 "ardour:Deck 1/audio_in 2"
+jack_disconnect Mixxx:out_6 "ardour:Deck 1/audio_in 1"
+jack_disconnect Mixxx:out_7 "ardour:Deck 1/audio_in 2"
+jack_disconnect Mixxx:out_6 "ardour:->D3+B3/audio_return 1"
+jack_disconnect Mixxx:out_7 "ardour:->D3+B3/audio_return 2"
 
 # Setup Mixxx output mapping
 jack_connect Mixxx:out_0 "ardour:Deck 1/audio_in 1"
@@ -29,14 +33,14 @@ jack_connect system:capture_1 "ardour:Master Mix/audio_in 1"
 jack_connect system:capture_2 "ardour:Master Mix/audio_in 2"
 
 # Setup Ardour outputs to sound cards
-jack_connect "ardour:Deck 1/audio_out 1" XONEK2:playback_3
-jack_connect "ardour:Deck 1/audio_out 2" XONEK2:playback_4
-jack_connect "ardour:Deck 2/audio_out 1" XONEK2:playback_1
-jack_connect "ardour:Deck 2/audio_out 2" XONEK2:playback_2
-jack_connect "ardour:Deck 3/audio_out 1" system:playback_3
-jack_connect "ardour:Deck 3/audio_out 2" system:playback_4
-jack_connect "ardour:Deck 4/audio_out 1" system:playback_1
-jack_connect "ardour:Deck 4/audio_out 2" system:playback_2
+jack_connect "ardour:D1+B1/audio_out 1" XONEK2:playback_3
+jack_connect "ardour:D1+B1/audio_out 2" XONEK2:playback_4
+jack_connect "ardour:D2+B2/audio_out 1" XONEK2:playback_1
+jack_connect "ardour:D2+B2/audio_out 2" XONEK2:playback_2
+jack_connect "ardour:D3+B3/audio_out 1" system:playback_3
+jack_connect "ardour:D3+B3/audio_out 2" system:playback_4
+jack_connect "ardour:D4+B4/audio_out 1" system:playback_1
+jack_connect "ardour:D4+B4/audio_out 2" system:playback_2
 
 # Setup MIDI connections
 jack_connect "a2j:XONE:K2 [28] (capture): XONE:K2 MIDI 1" "ardour:MIDI Control In"
