@@ -1,15 +1,26 @@
+# This is a pipewire based setup script to run Mixxx DJ sofware using 4 decks
+# "piped" through Ardour audio channels, then out to an external mixer. Midi
+# control and MIDI clock are included as well. Recording is supported by routing
+# audio from external mixer to Ardour via soundcard.
+
+# In the even the volume is very low on a soundcard, use alsamixer or
+# pavucontrol (Pulse Audio Volume Control) to set sound card volume levels.
+
 #!/usr/bin/env bash
 
 # Start Ardour Mixxx project
 Ardour6 /home/apmiller/mixxx_4_decks &
+# wait for Ardour to finish loading
+sleep 10
 # Start Mixxx with `--developer` flag to allow mapping to MIDI Through port
 mixxx -platform xcb --developer &
+# Wait for Mixxx to finish loading
+sleep 10
 
-# Wait for Ardour and Mixxx to finish loading
-sleep 20
+killall speech-dispatcher # Not sure why this is even running.
 
-# TODO: update this to use pw-link -d. use qgraph to see which links need cleaning up
-# Clean up busted connections
+# Clean up busted connections. I don't know why these exist by default, but they
+# are useless and need to be disconnected.
 pw-link -d "Midi-Bridge:BEHRINGER UMC204HD 192k at usb-0000:00:14-0-2-4- high speed:(capture_0) UMC204HD 192k MIDI 1" \
         "ardour:physical_midi_input_monitor_enable"
 pw-link -d "Midi-Bridge:XONE:K2 3:(capture_0) XONE:K2 MIDI 1" "ardour:physical_midi_input_monitor_enable"
@@ -26,43 +37,40 @@ pw-link -d Mixxx:out_4 "ardour:Deck 3/audio_in 1"
 pw-link -d Mixxx:out_5 "ardour:Deck 3/audio_in 2"
 pw-link -d Mixxx:out_6 "ardour:->D3+B3/audio_return 1"
 pw-link -d Mixxx:out_7 "ardour:->D3+B3/audio_return 2"
-jack_disconnect "ardour:auditioner/audio_out 1" system:playback_1
-jack_disconnect "ardour:auditioner/audio_out 2" system:playback_2
+pw-link -d "ardour:auditioner/audio_out 1" "alsa_output.usb-BEHRINGER_UMC204HD_192k-00.HiFi__umc204hd_stereo_out_U192k_0_0_1__sink:playback_FL"
+pw-link -d "ardour:auditioner/audio_out 2" "alsa_output.usb-BEHRINGER_UMC204HD_192k-00.HiFi__umc204hd_stereo_out_U192k_0_0_1__sink:playback_FR"
+pw-link -d "ardour:D4+B4/audio_out 1" "alsa_output.usb-BEHRINGER_UMC204HD_192k-00.HiFi__umc204hd_stereo_out_U192k_0_2_3__sink:playback_FL"
+pw-link -d "ardour:D4+B4/audio_out 2" "alsa_output.usb-BEHRINGER_UMC204HD_192k-00.HiFi__umc204hd_stereo_out_U192k_0_2_3__sink:playback_FR"
 
-# TODO update this to use pw-link. The IO names should be the same
 # Setup Mixxx output mapping
-jack_connect Mixxx:out_0 "ardour:Deck 1/audio_in 1"
-jack_connect Mixxx:out_1 "ardour:Deck 1/audio_in 2"
-jack_connect Mixxx:out_2 "ardour:Deck 2/audio_in 1"
-jack_connect Mixxx:out_3 "ardour:Deck 2/audio_in 2"
-jack_connect Mixxx:out_4 "ardour:Deck 3/audio_in 1"
-jack_connect Mixxx:out_5 "ardour:Deck 3/audio_in 2"
-jack_connect Mixxx:out_6 "ardour:Deck 4/audio_in 1"
-jack_connect Mixxx:out_7 "ardour:Deck 4/audio_in 2"
+pw-link Mixxx:out_0 "ardour:Deck 1/audio_in 1"
+pw-link Mixxx:out_1 "ardour:Deck 1/audio_in 2"
+pw-link Mixxx:out_2 "ardour:Deck 2/audio_in 1"
+pw-link Mixxx:out_3 "ardour:Deck 2/audio_in 2"
+pw-link Mixxx:out_4 "ardour:Deck 3/audio_in 1"
+pw-link Mixxx:out_5 "ardour:Deck 3/audio_in 2"
+pw-link Mixxx:out_6 "ardour:Deck 4/audio_in 1"
+pw-link Mixxx:out_7 "ardour:Deck 4/audio_in 2"
 
-# TODO update this to use pw-link. Use pw-link -o to get the output name
 # Setup recording from external mixer into Ardour
-jack_connect system:capture_1 "ardour:Master Mix/audio_in 1"
-jack_connect system:capture_2 "ardour:Master Mix/audio_in 2"
+pw-link "alsa_input.usb-BEHRINGER_UMC204HD_192k-00.HiFi__umc204hd_mono_in_U192k_0_0__source:capture_MONO" "ardour:Mixer Record/audio_in 1"
+pw-link "alsa_input.usb-BEHRINGER_UMC204HD_192k-00.HiFi__umc204hd_mono_in_U192k_0_1__source:capture_MONO" "ardour:Mixer Record/audio_in 2"
 
-# TODO update this to use pw-link. Use pw-link -i to get the hardware input names
 # Setup Ardour outputs to sound cards
-jack_connect "ardour:D1+B1/audio_out 1" XONEK2:playback_3
-jack_connect "ardour:D1+B1/audio_out 2" XONEK2:playback_4
-jack_connect "ardour:D2+B2/audio_out 1" XONEK2:playback_1
-jack_connect "ardour:D2+B2/audio_out 2" XONEK2:playback_2
-jack_connect "ardour:D3+B3/audio_out 1" system:playback_3
-jack_connect "ardour:D3+B3/audio_out 2" system:playback_4
-jack_connect "ardour:D4+B4/audio_out 1" system:playback_1
-jack_connect "ardour:D4+B4/audio_out 2" system:playback_2
+pw-link "ardour:D1+B1/audio_out 1" "alsa_output.usb-ALLEN_HEATH_LTD._XONE_K2-00.analog-surround-40:playback_RL"
+pw-link "ardour:D1+B1/audio_out 2" "alsa_output.usb-ALLEN_HEATH_LTD._XONE_K2-00.analog-surround-40:playback_RR"
+pw-link "ardour:D2+B2/audio_out 1" "alsa_output.usb-ALLEN_HEATH_LTD._XONE_K2-00.analog-surround-40:playback_FL"
+pw-link "ardour:D2+B2/audio_out 2" "alsa_output.usb-ALLEN_HEATH_LTD._XONE_K2-00.analog-surround-40:playback_FR"
+pw-link "ardour:D3+B3/audio_out 1" "alsa_output.usb-BEHRINGER_UMC204HD_192k-00.HiFi__umc204hd_stereo_out_U192k_0_2_3__sink:playback_FL"
+pw-link "ardour:D3+B3/audio_out 2" "alsa_output.usb-BEHRINGER_UMC204HD_192k-00.HiFi__umc204hd_stereo_out_U192k_0_2_3__sink:playback_FR"
+pw-link "ardour:D4+B4/audio_out 1" "alsa_output.usb-BEHRINGER_UMC204HD_192k-00.HiFi__umc204hd_stereo_out_U192k_0_0_1__sink:playback_FL"
+pw-link "ardour:D4+B4/audio_out 2" "alsa_output.usb-BEHRINGER_UMC204HD_192k-00.HiFi__umc204hd_stereo_out_U192k_0_0_1__sink:playback_FR"
 
-# TODO update this to use pw-link
 # Setup MIDI connections
-jack_connect "a2j:XONE:K2 [28] (capture): XONE:K2 MIDI 1" "ardour:MIDI Control In"
-jack_connect "a2j:XONE:K2 [28] (capture): XONE:K2 MIDI 1" "a2j:UMC204HD 192k [24] (playback): UMC204HD 192k MIDI 1"
-jack_connect "a2j:UMC204HD 192k [24] (capture): UMC204HD 192k MIDI 1" "ardour:MIDI Clock in"
-jack_connect "a2j:UMC204HD 192k [24] (capture): UMC204HD 192k MIDI 1" "a2j:UMC204HD 192k [24] (playback): UMC204HD 192k MIDI 1"
-
-jack_connect "a2j:XONE:K2 [28] (capture): XONE:K2 MIDI 1" "a2j:UMC204HD 192k [20] (playback): UMC204HD 192k MIDI 1"
-jack_connect "a2j:UMC204HD 192k [20] (capture): UMC204HD 192k MIDI 1" "ardour:MIDI Clock in"
-jack_connect "a2j:UMC204HD 192k [20] (capture): UMC204HD 192k MIDI 1" "a2j:UMC204HD 192k [20] (playback): UMC204HD 192k MIDI 1"
+pw-link "Midi-Bridge:XONE:K2 3:(capture_0) XONE:K2 MIDI 1" "ardour:MIDI Control In"
+pw-link "Midi-Bridge:XONE:K2 3:(capture_0) XONE:K2 MIDI 1" \
+        "Midi-Bridge:BEHRINGER UMC204HD 192k at usb-0000:00:14-0-2-4- high speed:(playback_0) UMC204HD 192k MIDI 1"
+pw-link "Midi-Bridge:BEHRINGER UMC204HD 192k at usb-0000:00:14-0-2-4- high speed:(capture_0) UMC204HD 192k MIDI 1" \
+        "ardour:MIDI Clock in"
+pw-link "Midi-Bridge:BEHRINGER UMC204HD 192k at usb-0000:00:14-0-2-4- high speed:(capture_0) UMC204HD 192k MIDI 1" \
+         "Midi-Bridge:BEHRINGER UMC204HD 192k at usb-0000:00:14-0-2-4- high speed:(playback_0) UMC204HD 192k MIDI 1"
