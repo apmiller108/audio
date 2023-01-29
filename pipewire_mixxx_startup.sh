@@ -1,12 +1,12 @@
+#!/usr/bin/env bash
+
 # This is a pipewire based setup script to run Mixxx DJ sofware using 4 decks
 # "piped" through Ardour audio channels, then out to an external mixer. Midi
 # control and MIDI clock are included as well. Recording is supported by routing
 # audio from external mixer to Ardour via soundcard.
 
-# In the even the volume is very low on a soundcard, use alsamixer or
+# In the event the volume is very low on a soundcard, use alsamixer or
 # pavucontrol (Pulse Audio Volume Control) to set sound card volume levels.
-
-#!/usr/bin/env bash
 
 # Start Ardour Mixxx project
 Ardour6 /home/apmiller/mixxx_4_decks &
