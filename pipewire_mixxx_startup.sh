@@ -21,14 +21,6 @@ killall speech-dispatcher # Not sure why this is even running.
 
 # Clean up busted connections. I don't know why these exist by default, but they
 # are useless and need to be disconnected.
-pw-link -d "Midi-Bridge:BEHRINGER UMC204HD 192k at usb-0000:00:14-0-2-4- high speed:(capture_0) UMC204HD 192k MIDI 1" \
-        "ardour:physical_midi_input_monitor_enable"
-pw-link -d "Midi-Bridge:Midi Through:(capture_0) Midi Through Port-0" "ardour:MTC in"
-pw-link -d "Midi-Bridge:Midi Through:(capture_0) Midi Through Port-0" "ardour:physical_midi_input_monitor_enable"
-pw-link -d "Midi-Bridge:XONE:K2 4:(capture_0) XONE:K2 MIDI 1" "ardour:physical_midi_input_monitor_enable"
-pw-link -d "Midi-Bridge:XONE:K2 3:(capture_0) XONE:K2 MIDI 1" "ardour:physical_midi_input_monitor_enable"
-pw-link -d "Midi-Bridge:Midi Fighter Twister 3:(capture_0) Midi Fighter Twister MIDI 1" "ardour:physical_midi_input_monitor_enable"
-pw-link -d "Midi-Bridge:Midi Fighter Twister 4:(capture_0) Midi Fighter Twister MIDI 1" "ardour:physical_midi_input_monitor_enable"
 pw-link -d alsa_input.usb-BEHRINGER_UMC204HD_192k-00.HiFi__umc204hd_mono_in_U192k_0_0__source:capture_MONO "ardour:physical_audio_input_monitor_enable"
 pw-link -d alsa_input.usb-BEHRINGER_UMC204HD_192k-00.HiFi__umc204hd_mono_in_U192k_0_1__source:capture_MONO "ardour:physical_audio_input_monitor_enable"
 pw-link -d alsa_input.pci-0000_00_1f.3.stereo-fallback:capture_FL "ardour:physical_audio_input_monitor_enable"
@@ -76,16 +68,30 @@ pw-link "ardour:Deck3/audio_out 2" "alsa_output.usb-BEHRINGER_UMC204HD_192k-00.H
 pw-link "ardour:Deck4/audio_out 1" "alsa_output.usb-BEHRINGER_UMC204HD_192k-00.HiFi__umc204hd_stereo_out_U192k_0_0_1__sink:playback_FL"
 pw-link "ardour:Deck4/audio_out 2" "alsa_output.usb-BEHRINGER_UMC204HD_192k-00.HiFi__umc204hd_stereo_out_U192k_0_0_1__sink:playback_FR"
 
+# MIDI Connections
+
+midi_fighter_out=$(pw-link -I -o | grep "Midi Fighter" | sed 's/^[[:space:]]*//' | sed 's/\([[:digit:]]*\).*$/\1/')
+xonek2_out=$(pw-link -I -o | grep "XONE:K2" | sed 's/^[[:space:]]*//' | sed 's/\([[:digit:]]*\).*$/\1/')
+umc204_in=$(pw-link -I -i | grep "UMC204HD 192k MIDI" | sed 's/^[[:space:]]*//' | sed 's/\([[:digit:]]*\).*$/\1/')
+umc204_out=$(pw-link -I -o | grep "UMC204HD 192k MIDI" | sed 's/^[[:space:]]*//' | sed 's/\([[:digit:]]*\).*$/\1/')
+midi_clock_in=$(pw-link -I -i | grep "MIDI Clock in" | sed 's/^[[:space:]]*//' | sed 's/\([[:digit:]]*\).*$/\1/')
+midi_control_in=$(pw-link -I -i | grep "MIDI Control In" | sed 's/^[[:space:]]*//' | sed 's/\([[:digit:]]*\).*$/\1/')
+
+# Clean up MIDI connections
+
+pw-link -d "Midi-Bridge:Midi Through:(capture_0) Midi Through Port-0" "ardour:MTC in"
+pw-link -d "Midi-Bridge:Midi Through:(capture_0) Midi Through Port-0" "ardour:physical_midi_input_monitor_enable"
+pw-link -d $xonek2_out "ardour:physical_midi_input_monitor_enable"
+pw-link -d $midi_fighter_out "ardour:physical_midi_input_monitor_enable"
+pw-link -d $umc204_out "ardour:physical_midi_input_monitor_enable"
+
 # Setup MIDI connections
-pw-link "Midi-Bridge:XONE:K2 4:(capture_0) XONE:K2 MIDI 1" "ardour:MIDI Control In"
-pw-link "Midi-Bridge:XONE:K2 3:(capture_0) XONE:K2 MIDI 1" "ardour:MIDI Control In"
-pw-link "Midi-Bridge:Midi Fighter Twister 3:(capture_0) Midi Fighter Twister MIDI 1" "ardour:MIDI Control In"
-pw-link "Midi-Bridge:Midi Fighter Twister 4:(capture_0) Midi Fighter Twister MIDI 1" "ardour:MIDI Control In"
-pw-link "Midi-Bridge:XONE:K2 4:(capture_0) XONE:K2 MIDI 1" \
-        "Midi-Bridge:BEHRINGER UMC204HD 192k at usb-0000:00:14-0-2-4- high speed:(playback_0) UMC204HD 192k MIDI 1"
-pw-link "Midi-Bridge:XONE:K2 3:(capture_0) XONE:K2 MIDI 1" \
-        "Midi-Bridge:BEHRINGER UMC204HD 192k at usb-0000:00:14-0-2-4- high speed:(playback_0) UMC204HD 192k MIDI 1"
-pw-link "Midi-Bridge:BEHRINGER UMC204HD 192k at usb-0000:00:14-0-2-4- high speed:(capture_0) UMC204HD 192k MIDI 1" \
-        "ardour:MIDI Clock in"
-pw-link "Midi-Bridge:BEHRINGER UMC204HD 192k at usb-0000:00:14-0-2-4- high speed:(capture_0) UMC204HD 192k MIDI 1" \
-         "Midi-Bridge:BEHRINGER UMC204HD 192k at usb-0000:00:14-0-2-4- high speed:(playback_0) UMC204HD 192k MIDI 1"
+
+pw-link $xonek2_out $midi_control_in
+pw-link $xonek2_out $umc204_in
+
+pw-link $midi_fighter_out $midi_control_in
+pw-link $midi_fighter_out $umc204_in
+
+pw-link $umc204_out $midi_clock_in
+pw-link $umc204_out $umc204_in
