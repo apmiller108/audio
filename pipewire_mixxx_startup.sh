@@ -8,6 +8,9 @@
 # In the event the volume is very low on a soundcard, use alsamixer or
 # pavucontrol (Pulse Audio Volume Control) to set sound card volume levels.
 
+# Midi connections needed before Ardour launch
+pw-link "Midi-Bridge:Midi Through:(capture_0) Midi Through Port-0" $midi_fighter_in
+
 # Start Ardour Mixxx project
 Ardour7 /home/apmiller/mixxx_4_decks_v2 &
 # wait for Ardour to finish loading
@@ -71,6 +74,7 @@ pw-link "ardour:Deck4/audio_out 2" "alsa_output.usb-BEHRINGER_UMC204HD_192k-00.H
 # MIDI Connections
 
 midi_fighter_out=$(pw-link -I -o | grep "Midi Fighter" | sed 's/^[[:space:]]*//' | sed 's/\([[:digit:]]*\).*$/\1/')
+midi_fighter_in=$(pw-link -I -i | grep "Midi Fighter" | sed 's/^[[:space:]]*//' | sed 's/\([[:digit:]]*\).*$/\1/')
 xonek2_out=$(pw-link -I -o | grep "XONE:K2" | sed 's/^[[:space:]]*//' | sed 's/\([[:digit:]]*\).*$/\1/')
 umc204_in=$(pw-link -I -i | grep "UMC204HD 192k MIDI" | sed 's/^[[:space:]]*//' | sed 's/\([[:digit:]]*\).*$/\1/')
 umc204_out=$(pw-link -I -o | grep "UMC204HD 192k MIDI" | sed 's/^[[:space:]]*//' | sed 's/\([[:digit:]]*\).*$/\1/')

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ArdourMIDIBindings version="1.0.0" name="Mixxx 4 Decks">
+  <DeviceInfo bank-size="4"/>
+  <Binding channel="1" ctl="1"   uri="/route/send/gain Deck1 1"/>
+  <Binding channel="5" ctl="1"   uri="/route/send/gain Deck1 2"/>
+  <Binding channel="1" ctl="5"   uri="/route/plugin/parameter D1B1 1 20"/>
+</ArdourMIDIBindings>
