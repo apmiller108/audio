@@ -8,8 +8,14 @@
 # In the event the volume is very low on a soundcard, use alsamixer or
 # pavucontrol (Pulse Audio Volume Control) to set sound card volume levels.
 
-# Midi connections needed before Ardour launch
-pw-link "Midi-Bridge:Midi Through:(capture_0) Midi Through Port-0" $midi_fighter_in
+# Device inputs and outputs variables. Find I/O ID from partial device name.
+midi_fighter_out=$(pw-link -I -o | grep "Midi Fighter" | sed 's/^[[:space:]]*//' | sed 's/\([[:digit:]]*\).*$/\1/')
+midi_fighter_in=$(pw-link -I -i | grep "Midi Fighter" | sed 's/^[[:space:]]*//' | sed 's/\([[:digit:]]*\).*$/\1/')
+xonek2_out=$(pw-link -I -o | grep "XONE:K2" | sed 's/^[[:space:]]*//' | sed 's/\([[:digit:]]*\).*$/\1/')
+umc204_in=$(pw-link -I -i | grep "UMC204HD 192k MIDI" | sed 's/^[[:space:]]*//' | sed 's/\([[:digit:]]*\).*$/\1/')
+umc204_out=$(pw-link -I -o | grep "UMC204HD 192k MIDI" | sed 's/^[[:space:]]*//' | sed 's/\([[:digit:]]*\).*$/\1/')
+midi_thru_in=$(pw-link -I -i | grep "Midi Through" | sed 's/^[[:space:]]*//' | sed 's/\([[:digit:]]*\).*$/\1/')
+midi_thru_out=$(pw-link -I -o | grep "Midi Through" | sed 's/^[[:space:]]*//' | sed 's/\([[:digit:]]*\).*$/\1/')
 
 # Start Ardour Mixxx project
 Ardour7 /home/apmiller/mixxx_4_decks_v2 &
@@ -21,6 +27,10 @@ mixxx -platform xcb &
 sleep 15
 
 killall speech-dispatcher # Not sure why this is even running.
+
+# Ardour inputs and outputs variables. Find I/O ID from partial device name.
+midi_clock_in=$(pw-link -I -i | grep "MIDI Clock in" | sed 's/^[[:space:]]*//' | sed 's/\([[:digit:]]*\).*$/\1/')
+midi_control_in=$(pw-link -I -i | grep "MIDI Control In" | sed 's/^[[:space:]]*//' | sed 's/\([[:digit:]]*\).*$/\1/')
 
 # Clean up busted connections. I don't know why these exist by default, but they
 # are useless and need to be disconnected.
@@ -46,6 +56,11 @@ pw-link -d "ardour:Deck3/audio_out 1" "alsa_output.usb-BEHRINGER_UMC204HD_192k-0
 pw-link -d "ardour:Deck3/audio_out 2" "alsa_output.usb-BEHRINGER_UMC204HD_192k-00.HiFi__umc204hd_stereo_out_U192k_0_0_1__sink:playback_FR"
 pw-link -d "ardour:Click/audio_out 1" "alsa_output.usb-BEHRINGER_UMC204HD_192k-00.HiFi__umc204hd_stereo_out_U192k_0_0_1__sink:playback_FL"
 pw-link -d "ardour:Click/audio_out 2" "alsa_output.usb-BEHRINGER_UMC204HD_192k-00.HiFi__umc204hd_stereo_out_U192k_0_0_1__sink:playback_FR"
+pw-link -d "alsa_input.usb-DisplayLink_Subosen_4K_Graphic_Docking_SUBN293105480-02.analog-stereo:capture_FL" "ardour:physical_audio_input_monitor_enable"
+pw-link -d "alsa_input.usb-DisplayLink_Subosen_4K_Graphic_Docking_SUBN293105480-02.analog-stereo:capture_RL" "ardour:physical_audio_input_monitor_enable"
+pw-link -d "alsa_input.pci-0000_00_1f.3.stereo-fallback.6:capture_FL" "ardour:physical_audio_input_monitor_enable"
+pw-link -d "alsa_input.pci-0000_00_1f.3.stereo-fallback.6:capture_FR" "ardour:physical_audio_input_monitor_enable"
+pw-link -d "alsa_input.pci-0000_00_1f.3.stereo-fallback.6:capture_FL" "ardour:LTC in"
 
 # Setup Mixxx output mapping
 pw-link Mixxx:out_0 "ardour:Deck1/audio_in 1"
@@ -73,29 +88,24 @@ pw-link "ardour:Deck4/audio_out 2" "alsa_output.usb-BEHRINGER_UMC204HD_192k-00.H
 
 # MIDI Connections
 
-midi_fighter_out=$(pw-link -I -o | grep "Midi Fighter" | sed 's/^[[:space:]]*//' | sed 's/\([[:digit:]]*\).*$/\1/')
-midi_fighter_in=$(pw-link -I -i | grep "Midi Fighter" | sed 's/^[[:space:]]*//' | sed 's/\([[:digit:]]*\).*$/\1/')
-xonek2_out=$(pw-link -I -o | grep "XONE:K2" | sed 's/^[[:space:]]*//' | sed 's/\([[:digit:]]*\).*$/\1/')
-umc204_in=$(pw-link -I -i | grep "UMC204HD 192k MIDI" | sed 's/^[[:space:]]*//' | sed 's/\([[:digit:]]*\).*$/\1/')
-umc204_out=$(pw-link -I -o | grep "UMC204HD 192k MIDI" | sed 's/^[[:space:]]*//' | sed 's/\([[:digit:]]*\).*$/\1/')
-midi_clock_in=$(pw-link -I -i | grep "MIDI Clock in" | sed 's/^[[:space:]]*//' | sed 's/\([[:digit:]]*\).*$/\1/')
-midi_control_in=$(pw-link -I -i | grep "MIDI Control In" | sed 's/^[[:space:]]*//' | sed 's/\([[:digit:]]*\).*$/\1/')
-
 # Clean up MIDI connections
 
 pw-link -d "Midi-Bridge:Midi Through:(capture_0) Midi Through Port-0" "ardour:MTC in"
 pw-link -d "Midi-Bridge:Midi Through:(capture_0) Midi Through Port-0" "ardour:physical_midi_input_monitor_enable"
 pw-link -d $xonek2_out "ardour:physical_midi_input_monitor_enable"
 pw-link -d $midi_fighter_out "ardour:physical_midi_input_monitor_enable"
+pw-link -d $midi_fighter_out "ardour:MTC in"
 pw-link -d $umc204_out "ardour:physical_midi_input_monitor_enable"
 
 # Setup MIDI connections
 
-pw-link $xonek2_out $midi_control_in
+pw-link $xonek2_out $midi_thru_in
 pw-link $xonek2_out $umc204_in
 
-pw-link $midi_fighter_out $midi_control_in
+pw-link $midi_fighter_out $midi_thru_in
 pw-link $midi_fighter_out $umc204_in
 
 pw-link $umc204_out $midi_clock_in
-pw-link $umc204_out $umc204_in
+# pw-link $umc204_out $umc204_in
+
+pw-link $midi_thru_out $midi_control_in
