@@ -22,8 +22,8 @@
   <Binding channel="5" ctl="1"   uri="/route/send/gain Deck1 2"/>
   <!-- hy-delay feedback -->
   <Binding channel="5" ctl="5"   uri="/route/plugin/parameter D1B2 2 23"/>
-  <!-- hy-delay time -->
-  <Binding channel="5" ctl="9"   uri="/route/plugin/parameter D1B2 2 3"/>
+  <!-- tal rever wet -->
+  <Binding channel="5" ctl="9"   uri="/route/plugin/parameter D1B2 3 2"/>
   <!-- blease filter frequency -->
   <Binding channel="5" ctl="13"   uri="/route/plugin/parameter D1B2 4 3"/>
   <!-- DECK 2 -->
@@ -40,8 +40,8 @@
   <Binding channel="1" ctl="14"   uri="/route/plugin/parameter D2B1 3 3"/>
   <!-- SEND/RETURN 2 -->
   <Binding channel="5" ctl="2"   uri="/route/send/gain Deck2 2"/>
-  <!-- hy-delay feedback -->
-  <Binding channel="5" ctl="6"   uri="/route/plugin/parameter D2B2 2 23"/>
+  <!-- tal rever wet -->
+  <Binding channel="5" ctl="6"   uri="/route/plugin/parameter D2B2 3 2"/>
   <!-- hy-delay time -->
   <Binding channel="5" ctl="10"   uri="/route/plugin/parameter D2B2 2 3"/>
   <!-- blease filter frequency -->
@@ -62,8 +62,8 @@
   <Binding channel="5" ctl="0"   uri="/route/send/gain Deck3 2"/>
   <!-- hy-delay feedback -->
   <Binding channel="5" ctl="4"   uri="/route/plugin/parameter D3B2 2 23"/>
-  <!-- hy-delay time -->
-  <Binding channel="5" ctl="8"   uri="/route/plugin/parameter D3B2 2 3"/>
+  <!-- tal rever wet -->
+  <Binding channel="5" ctl="8"   uri="/route/plugin/parameter D3B2 3 2"/>
   <!-- blease filter frequency -->
   <Binding channel="5" ctl="12"   uri="/route/plugin/parameter D3B2 4 3"/>
   <!-- DECK 3 -->
@@ -82,8 +82,8 @@
   <Binding channel="5" ctl="3"   uri="/route/send/gain Deck4 2"/>
   <!-- hy-delay feedback -->
   <Binding channel="5" ctl="7"   uri="/route/plugin/parameter D4B2 2 23"/>
-  <!-- hy-delay time -->
-  <Binding channel="5" ctl="11"   uri="/route/plugin/parameter D4B2 2 3"/>
+  <!-- tal rever wet -->
+  <Binding channel="5" ctl="11"   uri="/route/plugin/parameter D4B2 3 2"/>
   <!-- blease filter frequency -->
   <Binding channel="5" ctl="15"   uri="/route/plugin/parameter D4B2 4 3"/>
 </ArdourMIDIBindings>
