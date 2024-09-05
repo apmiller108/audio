@@ -14,6 +14,8 @@
   <Binding channel="1" ctl="1"   uri="/route/send/gain Deck1 2"/>
   <!-- SEND/RETURN 2 -->
   <Binding channel="5" ctl="1"   uri="/route/send/gain Deck1 1"/>
+  <!-- SEND/RETURN EXT -->
+  <Binding channel="11" ctl="9"   uri="/route/send/gain Deck1 3"/>
   <!-- DECK 2 -->
   <!-- lp filter -->
   <Binding channel="11" ctl="6"   uri="/route/plugin/parameter Deck2 1 3"/>
@@ -23,6 +25,8 @@
   <Binding channel="1" ctl="2"   uri="/route/send/gain Deck2 2"/>
   <!-- SEND/RETURN 2 -->
   <Binding channel="5" ctl="2"   uri="/route/send/gain Deck2 1"/>
+  <!-- SEND/RETURN EXT -->
+  <Binding channel="11" ctl="10"   uri="/route/send/gain Deck2 3"/>
   <!-- DECK 3 -->
   <!-- lp filter -->
   <Binding channel="11" ctl="4"   uri="/route/plugin/parameter Deck3 1 3"/>
@@ -32,6 +36,8 @@
   <Binding channel="1" ctl="0"   uri="/route/send/gain Deck3 2"/>
   <!-- SEND/RETURN 2 -->
   <Binding channel="5" ctl="0"   uri="/route/send/gain Deck3 1"/>
+  <!-- SEND/RETURN EXT -->
+  <Binding channel="11" ctl="8"   uri="/route/send/gain Deck3 3"/>
   <!-- DECK 4 -->
   <!-- lp filter -->
   <Binding channel="11" ctl="7"   uri="/route/plugin/parameter Deck4 1 3"/>
@@ -41,6 +47,8 @@
   <Binding channel="1" ctl="3"   uri="/route/send/gain Deck4 2"/>
   <!-- SEND/RETURN 2 -->
   <Binding channel="5" ctl="3"   uri="/route/send/gain Deck4 1"/>
+  <!-- SEND/RETURN EXT -->
+  <Binding channel="11" ctl="11"   uri="/route/send/gain Deck4 3"/>
   <!-- FX1 -->
   <!-- blease delay feedback -->
   <Binding channel="1" ctl="4"   uri="/route/plugin/parameter FX1 1 20"/>
@@ -49,10 +57,10 @@
   <!-- blease filter frequency -->
   <Binding channel="1" ctl="12"   uri="/route/plugin/parameter FX1 3 3"/>
   <!-- FX2 -->
-  <!-- hy-delay feedback -->
-  <Binding channel="5" ctl="6"   uri="/route/plugin/parameter FX2 2 23"/>
+  <!-- LSP Slapback Delay Pre-Delay -->
+  <Binding channel="1" ctl="6"   uri="/route/plugin/parameter FX2 2 4"/>
   <!-- tal rever wet -->
-  <Binding channel="5" ctl="10"   uri="/route/plugin/parameter FX2 3 2"/>
+  <Binding channel="1" ctl="10"   uri="/route/plugin/parameter FX2 3 2"/>
   <!-- blease filter frequency -->
-  <Binding channel="5" ctl="14"   uri="/route/plugin/parameter FX2 4 3"/>
+  <Binding channel="1" ctl="14"   uri="/route/plugin/parameter FX2 6 3"/>
 </ArdourMIDIBindings>
