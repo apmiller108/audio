@@ -34,8 +34,6 @@ mixxx -platform xcb &
 # Wait for Mixxx to finish loading
 sleep 15
 
-killall speech-dispatcher # Not sure why this is even running.
-
 # Ardour inputs and outputs variables. Find I/O ID from partial device name.
 midi_clock_in=$(pw-link -I -i | grep "MIDI Clock in" | sed 's/^[[:space:]]*//' | sed 's/\([[:digit:]]*\).*$/\1/')
 midi_control_in=$(pw-link -I -i | grep "MIDI Control In" | sed 's/^[[:space:]]*//' | sed 's/\([[:digit:]]*\).*$/\1/')
@@ -52,7 +50,6 @@ pw-link -d Mixxx:out_7 "ardour:Deck1/audio_in 2"
 pw-link -d Mixxx:out_6 "ardour:->D3+B3/audio_return 1"
 pw-link -d Mixxx:out_7 "ardour:->D3+B3/audio_return 2"
 
-
 # Setup Mixxx output mapping
 pw-link Mixxx:out_0 "ardour:Deck1/audio_in 1"
 pw-link Mixxx:out_1 "ardour:Deck1/audio_in 2"
@@ -65,16 +62,17 @@ pw-link Mixxx:out_7 "ardour:Deck4/audio_in 2"
 
 # Setup MIDI connections
 
-pw-link $xonek2_midi_out $midi_thru_in
-pw-link $xonek2_midi_out $umc204_midi_in
+pw-link $midi_fighter_out $midi_thru_in # To control effects in Ardour
+pw-link $midi_fighter_out $umc204_midi_in # To control Beebo
 
-pw-link $midi_fighter_out $midi_thru_in
-pw-link $midi_fighter_out $umc204_midi_in
+# Xone PX5 physical midi clock output connected to UMC204
+pw-link $umc204_midi_out $midi_clock_in
+pw-link $umc204_midi_out $umc204_midi_in
 
-pw-link $xonepx5_midi_out $umc204_midi_in
-pw-link $xonepx5_midi_out $midi_clock_in
+# For Xonek2 via x-link, which controls some effects in Ardour (eg, filter, external send)
+pw-link $xonepx5_midi_out $midi_thru_in
 
-pw-link $midi_thru_out $midi_control_in
+pw-link $midi_thru_out $midi_control_in 
 
 if [ -n "$record" ]; then
   Ardour7 /home/apmiller/Recording &
