@@ -15,28 +15,42 @@ do
   esac
 done
 
+find_pw_output_id() {
+  local search_string="$1"
+  pw-link -I -o | grep "$search_string" | sed 's/^[[:space:]]*//' | \
+    sed 's/\([[:digit:]]*\).*$/\1/'
+}
+
+find_pw_input_id() {
+  local search_string="$1"
+  pw-link -I -i | grep "$search_string" | sed 's/^[[:space:]]*//' | \
+    sed 's/\([[:digit:]]*\).*$/\1/'
+}
 # Device inputs and outputs variables. Find I/O ID from partial device name.
-midi_fighter_out=$(pw-link -I -o | grep "Midi Fighter" | sed 's/^[[:space:]]*//' | sed 's/\([[:digit:]]*\).*$/\1/')
-midi_fighter_in=$(pw-link -I -i | grep "Midi Fighter" | sed 's/^[[:space:]]*//' | sed 's/\([[:digit:]]*\).*$/\1/')
-xonek2_midi_out=$(pw-link -I -o | grep "K2 MIDI" | sed 's/^[[:space:]]*//' | sed 's/\([[:digit:]]*\).*$/\1/')
-xonepx5_midi_out=$(pw-link -I -o | grep "PX5 MIDI" | sed 's/^[[:space:]]*//' | sed 's/\([[:digit:]]*\).*$/\1/')
-umc204_midi_in=$(pw-link -I -i | grep "UMC204HD 192k MIDI" | sed 's/^[[:space:]]*//' | sed 's/\([[:digit:]]*\).*$/\1/')
-umc204_midi_out=$(pw-link -I -o | grep "UMC204HD 192k MIDI" | sed 's/^[[:space:]]*//' | sed 's/\([[:digit:]]*\).*$/\1/')
-midi_thru_in=$(pw-link -I -i | grep "Midi Through" | sed 's/^[[:space:]]*//' | sed 's/\([[:digit:]]*\).*$/\1/')
-midi_thru_out=$(pw-link -I -o | grep "Midi Through" | sed 's/^[[:space:]]*//' | sed 's/\([[:digit:]]*\).*$/\1/')
+midi_fighter_out=$(find_pw_output_id "Midi Fighter")
+midi_fighter_in=$(find_pw_input_id "Midi Fighter")
+xonek2_midi_out=$(find_pw_output_id "K2 MIDI")
+xonepx5_midi_out=$(find_pw_output_id "PX5 MIDI")
+xonepx5_midi_in=$(find_pw_input_id "PX5 MIDI")
+umc204_midi_in=$(find_pw_input_id "UMC204 HD 192k MIDI")
+umc204_midi_out=$(find_pw_output_id "UMC204 HD 192k MIDI")
+midi_thru_in=$(find_pw_input_id "Midi Through")
+midi_thru_out=$(find_pw_output_id "Midi Through")
+mixxx_midi_clock_out=$(find_pw_output_id "Arduino Leonardo MIDI")
 
 # Start Ardour Mixxx project
-Ardour7 /home/apmiller/mixxx_4_decks_v2 &
+PIPEWIRE_QUANTUM=256/48000 Ardour7 /home/apmiller/mixxx_4_decks_v2 &
 # wait for Ardour to finish loading
 sleep 10
-# Start Mixxx with `--developer` flag to allow mapping to MIDI Through port
-mixxx -platform xcb &
+# Start Mixxx with `--developer` flag to allow mapping to MIDI Through port and
+# verbose logging
+PIPEWIRE_QUANTUM=256/48000 mixxx &
 # Wait for Mixxx to finish loading
 sleep 15
 
 # Ardour inputs and outputs variables. Find I/O ID from partial device name.
-midi_clock_in=$(pw-link -I -i | grep "MIDI Clock in" | sed 's/^[[:space:]]*//' | sed 's/\([[:digit:]]*\).*$/\1/')
-midi_control_in=$(pw-link -I -i | grep "MIDI Control In" | sed 's/^[[:space:]]*//' | sed 's/\([[:digit:]]*\).*$/\1/')
+ardour_midi_clock_in=$(find_pw_input_id "MIDI Clock in")
+ardour_midi_control_in=$(find_pw_input_id "MIDI Control in")
 
 # Clean up useless links
 pw-link -d Mixxx:out_0 "ardour:physical_audio_input_monitor_enable"
@@ -62,17 +76,21 @@ pw-link Mixxx:out_7 "ardour:Deck4/audio_in 2"
 
 # Setup MIDI connections
 
-pw-link $midi_fighter_out $midi_thru_in # To control effects in Ardour
-pw-link $midi_fighter_out $umc204_midi_in # To control Beebo
+# Midi Fighter to control effects in Ardour
+pw-link $midi_fighter_out $midi_thru_in
 
-# Xone PX5 physical midi clock output connected to UMC204
-pw-link $umc204_midi_out $midi_clock_in
-pw-link $umc204_midi_out $umc204_midi_in
+# Midi Fighter to control Beebo
+pw-link $midi_fighter_out $umc204_midi_in
+pw-link $umc204_midi_in $umc204_midi_out
+
+# Mixxx MIDI Clock output
+pw-link $mixxx_midi_clock_out $ardour_midi_clock_in
+pw-link $mixxx_midi_clock_out $xonepx5_midi_in
+pw-link $mixxx_midi_clock_out $umc204_midi_in # To Beebo via UMC in->out above
 
 # For Xonek2 via x-link, which controls some effects in Ardour (eg, filter, external send)
 pw-link $xonepx5_midi_out $midi_thru_in
-
-pw-link $midi_thru_out $midi_control_in 
+pw-link $midi_thru_out $ardour_midi_control_in
 
 if [ -n "$record" ]; then
   Ardour7 /home/apmiller/Recording &
