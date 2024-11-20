@@ -32,21 +32,23 @@ midi_fighter_in=$(find_pw_input_id "Midi Fighter")
 xonek2_midi_out=$(find_pw_output_id "K2 MIDI")
 xonepx5_midi_out=$(find_pw_output_id "PX5 MIDI")
 xonepx5_midi_in=$(find_pw_input_id "PX5 MIDI")
-umc204_midi_in=$(find_pw_input_id "UMC204 HD 192k MIDI")
-umc204_midi_out=$(find_pw_output_id "UMC204 HD 192k MIDI")
+umc204_midi_in=$(find_pw_input_id "UMC204HD 192k MIDI")
+umc204_midi_out=$(find_pw_output_id "UMC204HD 192k MIDI")
 midi_thru_in=$(find_pw_input_id "Midi Through")
 midi_thru_out=$(find_pw_output_id "Midi Through")
 mixxx_midi_clock_out=$(find_pw_output_id "Arduino Leonardo MIDI")
 
 # Start Ardour Mixxx project
-PIPEWIRE_QUANTUM=256/48000 Ardour7 /home/apmiller/mixxx_4_decks_v2 &
+# PIPEWIRE_QUANTUM=256/48000 Ardour7 /home/apmiller/mixxx_4_decks_v2 &
+Ardour7 /home/apmiller/mixxx_4_decks_v2 &
 # wait for Ardour to finish loading
-sleep 10
+sleep 15
 # Start Mixxx with `--developer` flag to allow mapping to MIDI Through port and
 # verbose logging
-PIPEWIRE_QUANTUM=256/48000 mixxx &
+# PIPEWIRE_QUANTUM=256/48000 mixxx &
+mixxx &
 # Wait for Mixxx to finish loading
-sleep 15
+sleep 10
 
 # Ardour inputs and outputs variables. Find I/O ID from partial device name.
 ardour_midi_clock_in=$(find_pw_input_id "MIDI Clock in")
