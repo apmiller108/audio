@@ -37,12 +37,13 @@ umc204_midi_out=$(find_pw_output_id "UMC204HD 192k MIDI")
 midi_thru_in=$(find_pw_input_id "Midi Through")
 midi_thru_out=$(find_pw_output_id "Midi Through")
 mixxx_midi_clock_out=$(find_pw_output_id "Arduino Leonardo MIDI")
+sq1_midi_in=$(find_pw_output_id "SQ-1 SQ-1 _ CTRL")
 
 # Start Ardour Mixxx project
 # PIPEWIRE_QUANTUM=256/48000 Ardour7 /home/apmiller/mixxx_4_decks_v2 &
-Ardour7 /home/apmiller/mixxx_4_decks_v2 &
+# Ardour7 /home/apmiller/mixxx_4_decks_v2 &
 # wait for Ardour to finish loading
-sleep 15
+# sleep 15
 # Start Mixxx with `--developer` flag to allow mapping to MIDI Through port and
 # verbose logging
 # PIPEWIRE_QUANTUM=256/48000 mixxx &
@@ -89,6 +90,7 @@ pw-link $umc204_midi_in $umc204_midi_out
 pw-link $mixxx_midi_clock_out $ardour_midi_clock_in
 pw-link $mixxx_midi_clock_out $xonepx5_midi_in
 pw-link $mixxx_midi_clock_out $umc204_midi_in # To Beebo via UMC in->out above
+pw-link $mixxx_midi_clock_out $sq1_midi_in
 
 # For Xonek2 via x-link, which controls some effects in Ardour (eg, filter, external send)
 pw-link $xonepx5_midi_out $midi_thru_in
