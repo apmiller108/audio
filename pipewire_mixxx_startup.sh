@@ -27,7 +27,8 @@ declare -A MIDI_DEVICES=(
     ["UMC204HD"]="UMC204HD 192k MIDI"
     ["Midi Through"]="Midi Through"
     ["Arduino Leonardo"]="Arduino Leonardo MIDI"
-    ["SQ-1"]="SQ-1 SQ-1 _ CTRL"
+    ["SQ-1"]="SQ-1"
+    ["Audio 8 DJ"]="Midi.+Audio\s8\sDJ"
 )
 
 # Parse command line arguments
