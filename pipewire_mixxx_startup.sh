@@ -276,6 +276,8 @@ start_recording() {
 
 # Main execution
 main() {
+    system76-power profile performance
+
     if [[ "$SHOW_INFO" == true ]]; then
         setup_virtual_midi
         show_midi_info
