@@ -223,6 +223,8 @@ setup_midi_routing() {
         create_link_with_error_handling "$mixxx_midi_clock_out" "$virtual_midi_in0"
     [[ -n "$virtual_midi_in1" && -n "$xonepx5_midi_out" ]] && \
         create_link_with_error_handling "$xonepx5_midi_out" "$virtual_midi_in1"
+    [[ -n "$virtual_midi_in1" && -n "$xonek2_midi_out" ]] && \
+        create_link_with_error_handling "$xonek2_midi_out" "$virtual_midi_in1"
     [[ -n "$virtual_midi_in2" && -n "$midi_fighter_out" ]] && \
         create_link_with_error_handling "$midi_fighter_out" "$virtual_midi_in2"
 
@@ -231,8 +233,6 @@ setup_midi_routing() {
         create_link_with_error_handling "$midi_fighter_out" "$midi_thru_in"
     [[ -n "$midi_fighter_out" && -n "$umc204_midi_in" ]] && \
         create_link_with_error_handling "$midi_fighter_out" "$umc204_midi_in"
-    [[ -n "$umc204_midi_in" && -n "$umc204_midi_out" ]] && \
-        create_link_with_error_handling "$umc204_midi_in" "$umc204_midi_out"
 
     # MIDI Clock routing
     if [[ -n "$mixxx_midi_clock_out" ]]; then
