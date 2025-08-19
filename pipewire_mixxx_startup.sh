@@ -147,6 +147,8 @@ get_device_ids() {
     midi_thru_out=$(find_pw_output_id "${MIDI_DEVICES["Midi Through"]}")
     mixxx_midi_clock_out=$(find_pw_output_id "${MIDI_DEVICES["Arduino Leonardo"]}")
     sq1_midi_in=$(find_pw_input_id "${MIDI_DEVICES["SQ-1"]}")
+    dj_8_midi_out=$(find_pw_output_id "${MIDI_DEVICES["Audio 8 DJ"]}")
+    dj_8_midi_in=$(find_pw_input_id "${MIDI_DEVICES["Audio 8 DJ"]}")
 
     # Virtual MIDI devices
     virtual_midi_in0=$(find_pw_input_id "VirMIDI\s+.+-0")
