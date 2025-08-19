@@ -123,23 +123,30 @@ show_midi_info() {
 }
 
 setup_virtual_midi() {
-    echo "Setting up virtual MIDI ports..."
+  echo "Setting up virtual MIDI ports..."
+
+  if lsmod | grep -q "snd_virmidi"; then
+    echo "snd-virmidi module already loaded"
+  else
+    echo "Loading snd-virmidi module (requires sudo)..."
     sudo modprobe snd-virmidi
+  fi
 }
+
 
 get_device_ids() {
     # Get all device IDs
-    midi_fighter_out=$(find_pw_output_id "Midi Fighter")
-    midi_fighter_in=$(find_pw_input_id "Midi Fighter")
-    xonek2_midi_out=$(find_pw_output_id "K2 MIDI")
-    xonepx5_midi_out=$(find_pw_output_id "PX5 MIDI")
-    xonepx5_midi_in=$(find_pw_input_id "PX5 MIDI")
-    umc204_midi_in=$(find_pw_input_id "UMC204HD 192k MIDI")
-    umc204_midi_out=$(find_pw_output_id "UMC204HD 192k MIDI")
-    midi_thru_in=$(find_pw_input_id "Midi Through")
-    midi_thru_out=$(find_pw_output_id "Midi Through")
-    mixxx_midi_clock_out=$(find_pw_output_id "Arduino Leonardo MIDI")
-    sq1_midi_in=$(find_pw_input_id "SQ-1 SQ-1 _ CTRL")
+    midi_fighter_out=$(find_pw_output_id "${MIDI_DEVICES["Midi Fighter"]}")
+    midi_fighter_in=$(find_pw_input_id "${MIDI_DEVICES["Midi Fighter"]}")
+    xonek2_midi_out=$(find_pw_output_id "${MIDI_DEVICES["K2 MIDI"]}")
+    xonepx5_midi_out=$(find_pw_output_id "${MIDI_DEVICES["PX5 MIDI"]}")
+    xonepx5_midi_in=$(find_pw_input_id "${MIDI_DEVICES["PX5 MIDI"]}")
+    umc204_midi_in=$(find_pw_input_id "${MIDI_DEVICES["UMC204HD"]}")
+    umc204_midi_out=$(find_pw_output_id "${MIDI_DEVICES["UMC204HD"]}")
+    midi_thru_in=$(find_pw_input_id "${MIDI_DEVICES["Midi Through"]}")
+    midi_thru_out=$(find_pw_output_id "${MIDI_DEVICES["Midi Through"]}")
+    mixxx_midi_clock_out=$(find_pw_output_id "${MIDI_DEVICES["Arduino Leonardo"]}")
+    sq1_midi_in=$(find_pw_input_id "${MIDI_DEVICES["SQ-1"]}")
 
     # Virtual MIDI devices
     virtual_midi_in0=$(find_pw_input_id "VirMIDI\s+.+-0")
@@ -169,28 +176,54 @@ start_mixxx() {
     sleep 10
 }
 
+# Checks if a PipeWire port exists
+port_exists() {
+  pw-link -o | grep -q "^$1$" || pw-link -i | grep -q "^$1$"
+}
+
+# Creates a PipeWire link and validates that the input and output ports exist
+create_link_with_validation() {
+  local source="$1"
+  local target="$2"
+
+  echo "Checking ports for: $source -> $target"
+
+  if ! port_exists "$source"; then
+    echo "ERROR: Source port '$source' does not exist"
+    return 1
+  fi
+
+  if ! port_exists "$target"; then
+    echo "ERROR: Target port '$target' does not exist"
+    return 1
+  fi
+
+  echo "Linking: $source -> $target"
+  pw-link "$source" "$target"
+}
+
 setup_bitwig_audio_routing() {
     echo "Setting up Bitwig audio routing..."
-    pw-link Mixxx:out_0 "Bitwig Studio:Mixxx D1_L"
-    pw-link Mixxx:out_1 "Bitwig Studio:Mixxx D1_R"
-    pw-link Mixxx:out_2 "Bitwig Studio:Mixxx D2_L"
-    pw-link Mixxx:out_3 "Bitwig Studio:Mixxx D2_R"
-    pw-link Mixxx:out_4 "Bitwig Studio:Mixxx D3_L"
-    pw-link Mixxx:out_5 "Bitwig Studio:Mixxx D3_R"
-    pw-link Mixxx:out_6 "Bitwig Studio:Mixxx D4_L"
-    pw-link Mixxx:out_7 "Bitwig Studio:Mixxx D4_R"
+    create_link_with_validation "Mixxx:out_0" "Bitwig Studio:Mixxx D1_L"
+    create_link_with_validation "Mixxx:out_1" "Bitwig Studio:Mixxx D1_R"
+    create_link_with_validation "Mixxx:out_2" "Bitwig Studio:Mixxx D2_L"
+    create_link_with_validation "Mixxx:out_3" "Bitwig Studio:Mixxx D2_R"
+    create_link_with_validation "Mixxx:out_4" "Bitwig Studio:Mixxx D3_L"
+    create_link_with_validation "Mixxx:out_5" "Bitwig Studio:Mixxx D3_R"
+    create_link_with_validation "Mixxx:out_6" "Bitwig Studio:Mixxx D4_L"
+    create_link_with_validation "Mixxx:out_7" "Bitwig Studio:Mixxx D4_R"
 }
 
 setup_ardour_audio_routing() {
     echo "Setting up Ardour audio routing..."
-    pw-link Mixxx:out_0 "ardour:Deck1/audio_in 1"
-    pw-link Mixxx:out_1 "ardour:Deck1/audio_in 2"
-    pw-link Mixxx:out_2 "ardour:Deck2/audio_in 1"
-    pw-link Mixxx:out_3 "ardour:Deck2/audio_in 2"
-    pw-link Mixxx:out_4 "ardour:Deck3/audio_in 1"
-    pw-link Mixxx:out_5 "ardour:Deck3/audio_in 2"
-    pw-link Mixxx:out_6 "ardour:Deck4/audio_in 1"
-    pw-link Mixxx:out_7 "ardour:Deck4/audio_in 2"
+    create_link_with_validation "Mixxx:out_0" "ardour:Deck1/audio_in 1"
+    create_link_with_validation "Mixxx:out_1" "ardour:Deck1/audio_in 2"
+    create_link_with_validation "Mixxx:out_2" "ardour:Deck2/audio_in 1"
+    create_link_with_validation "Mixxx:out_3" "ardour:Deck2/audio_in 2"
+    create_link_with_validation "Mixxx:out_4" "ardour:Deck3/audio_in 1"
+    create_link_with_validation "Mixxx:out_5" "ardour:Deck3/audio_in 2"
+    create_link_with_validation "Mixxx:out_6" "ardour:Deck4/audio_in 1"
+    create_link_with_validation "Mixxx:out_7" "ardour:Deck4/audio_in 2"
 }
 
 setup_midi_routing() {
@@ -198,37 +231,37 @@ setup_midi_routing() {
 
     # Virtual MIDI routing for DAW
     [[ -n "$virtual_midi_in0" && -n "$mixxx_midi_clock_out" ]] && \
-        pw-link "$mixxx_midi_clock_out" "$virtual_midi_in0"
+        create_link_with_validation "$mixxx_midi_clock_out" "$virtual_midi_in0"
     [[ -n "$virtual_midi_in1" && -n "$xonepx5_midi_out" ]] && \
-        pw-link "$xonepx5_midi_out" "$virtual_midi_in1"
+        create_link_with_validation "$xonepx5_midi_out" "$virtual_midi_in1"
     [[ -n "$virtual_midi_in2" && -n "$midi_fighter_out" ]] && \
-        pw-link "$midi_fighter_out" "$virtual_midi_in2"
+        create_link_with_validation "$midi_fighter_out" "$virtual_midi_in2"
 
     # Midi Fighter routing
     [[ -n "$midi_fighter_out" && -n "$midi_thru_in" ]] && \
-        pw-link "$midi_fighter_out" "$midi_thru_in"
+        create_link_with_validation "$midi_fighter_out" "$midi_thru_in"
     [[ -n "$midi_fighter_out" && -n "$umc204_midi_in" ]] && \
-        pw-link "$midi_fighter_out" "$umc204_midi_in"
+        create_link_with_validation "$midi_fighter_out" "$umc204_midi_in"
     [[ -n "$umc204_midi_in" && -n "$umc204_midi_out" ]] && \
-        pw-link "$umc204_midi_in" "$umc204_midi_out"
+        create_link_with_validation "$umc204_midi_in" "$umc204_midi_out"
 
     # MIDI Clock routing
     if [[ -n "$mixxx_midi_clock_out" ]]; then
-        [[ -n "$xonepx5_midi_in" ]] && pw-link "$mixxx_midi_clock_out" "$xonepx5_midi_in"
-        [[ -n "$umc204_midi_in" ]] && pw-link "$mixxx_midi_clock_out" "$umc204_midi_in"
-        [[ -n "$sq1_midi_in" ]] && pw-link "$mixxx_midi_clock_out" "$sq1_midi_in"
+        [[ -n "$xonepx5_midi_in" ]] && create_link_with_validation "$mixxx_midi_clock_out" "$xonepx5_midi_in"
+        [[ -n "$umc204_midi_in" ]] && create_link_with_validation "$mixxx_midi_clock_out" "$umc204_midi_in"
+        [[ -n "$sq1_midi_in" ]] && create_link_with_validation "$mixxx_midi_clock_out" "$sq1_midi_in"
 
         if [[ "$DAW" == "ardour" ]]; then
             ardour_midi_clock_in=$(find_pw_input_id "MIDI Clock in")
-            [[ -n "$ardour_midi_clock_in" ]] && pw-link "$mixxx_midi_clock_out" "$ardour_midi_clock_in"
+            [[ -n "$ardour_midi_clock_in" ]] && create_link_with_validation "$mixxx_midi_clock_out" "$ardour_midi_clock_in"
         fi
     fi
 
     # Xone routing for Ardour control
     if [[ "$DAW" == "ardour" && -n "$xonepx5_midi_out" && -n "$midi_thru_in" && -n "$midi_thru_out" ]]; then
-        pw-link "$xonepx5_midi_out" "$midi_thru_in"
+        create_link_with_validation "$xonepx5_midi_out" "$midi_thru_in"
         ardour_midi_control_in=$(find_pw_input_id "MIDI Control in")
-        [[ -n "$ardour_midi_control_in" ]] && pw-link "$midi_thru_out" "$ardour_midi_control_in"
+        [[ -n "$ardour_midi_control_in" ]] && create_link_with_validation "$midi_thru_out" "$ardour_midi_control_in"
     fi
 }
 
