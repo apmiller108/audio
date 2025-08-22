@@ -283,7 +283,8 @@ main() {
             start_bitwig
             ;;
         "ardour")
-            start_ardour
+            # start_ardour
+            echo "Start Ardour before running this script..."
             ;;
     esac
 
