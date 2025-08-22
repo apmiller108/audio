@@ -26,7 +26,7 @@ declare -A MIDI_DEVICES=(
     ["UMC204HD"]="UMC204HD 192k MIDI"
     ["Midi Through"]="Midi Through"
     ["Arduino Leonardo"]="Arduino Leonardo MIDI"
-    ["SQ-1"]="SQ-1"
+    ["SQ-1"]="SQ-1.+CTRL"
     ["Audio 8 DJ"]="Midi.+Audio\s8\sDJ"
 )
 
@@ -226,12 +226,12 @@ setup_midi_routing() {
     # Midi Fighter routing
     [[ -n "$midi_fighter_out" && -n "$midi_thru_in" ]] && \
         create_link_with_error_handling "$midi_fighter_out" "$midi_thru_in"
-    [[ -n "$midi_fighter_out" && -n "$umc204_midi_in" ]] && \
-        create_link_with_error_handling "$midi_fighter_out" "$umc204_midi_in"
+    [[ -n "$midi_fighter_out" && -n "$dj_8_midi_in" ]] && \
+        create_link_with_error_handling "$midi_fighter_out" "$dj_8_midi_in"
 
     # MIDI Clock routing
     if [[ -n "$mixxx_midi_clock_out" ]]; then
-        [[ -n "$umc204_midi_in" ]] && create_link_with_error_handling "$mixxx_midi_clock_out" "$umc204_midi_in"
+        [[ -n "$dj_8_midi_in" ]] && create_link_with_error_handling "$mixxx_midi_clock_out" "$dj_8_midi_in"
         [[ -n "$sq1_midi_in" ]] && create_link_with_error_handling "$mixxx_midi_clock_out" "$sq1_midi_in"
 
         if [[ "$DAW" == "ardour" ]]; then
