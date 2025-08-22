@@ -23,7 +23,6 @@ RECORDING_PROJECT="/home/apmiller/Recording"
 declare -A MIDI_DEVICES=(
     ["Midi Fighter"]="Midi Fighter"
     ["K2 MIDI"]="K2 MIDI"
-    ["PX5 MIDI"]="PX5 MIDI"
     ["UMC204HD"]="UMC204HD 192k MIDI"
     ["Midi Through"]="Midi Through"
     ["Arduino Leonardo"]="Arduino Leonardo MIDI"
@@ -139,8 +138,6 @@ get_device_ids() {
     midi_fighter_out=$(find_pw_output_id "${MIDI_DEVICES["Midi Fighter"]}")
     midi_fighter_in=$(find_pw_input_id "${MIDI_DEVICES["Midi Fighter"]}")
     xonek2_midi_out=$(find_pw_output_id "${MIDI_DEVICES["K2 MIDI"]}")
-    xonepx5_midi_out=$(find_pw_output_id "${MIDI_DEVICES["PX5 MIDI"]}")
-    xonepx5_midi_in=$(find_pw_input_id "${MIDI_DEVICES["PX5 MIDI"]}")
     umc204_midi_in=$(find_pw_input_id "${MIDI_DEVICES["UMC204HD"]}")
     umc204_midi_out=$(find_pw_output_id "${MIDI_DEVICES["UMC204HD"]}")
     midi_thru_in=$(find_pw_input_id "${MIDI_DEVICES["Midi Through"]}")
@@ -221,8 +218,6 @@ setup_midi_routing() {
     # Virtual MIDI routing for DAW
     [[ -n "$virtual_midi_in0" && -n "$mixxx_midi_clock_out" ]] && \
         create_link_with_error_handling "$mixxx_midi_clock_out" "$virtual_midi_in0"
-    [[ -n "$virtual_midi_in1" && -n "$xonepx5_midi_out" ]] && \
-        create_link_with_error_handling "$xonepx5_midi_out" "$virtual_midi_in1"
     [[ -n "$virtual_midi_in1" && -n "$xonek2_midi_out" ]] && \
         create_link_with_error_handling "$xonek2_midi_out" "$virtual_midi_in1"
     [[ -n "$virtual_midi_in2" && -n "$midi_fighter_out" ]] && \
@@ -236,7 +231,6 @@ setup_midi_routing() {
 
     # MIDI Clock routing
     if [[ -n "$mixxx_midi_clock_out" ]]; then
-        [[ -n "$xonepx5_midi_in" ]] && create_link_with_error_handling "$mixxx_midi_clock_out" "$xonepx5_midi_in"
         [[ -n "$umc204_midi_in" ]] && create_link_with_error_handling "$mixxx_midi_clock_out" "$umc204_midi_in"
         [[ -n "$sq1_midi_in" ]] && create_link_with_error_handling "$mixxx_midi_clock_out" "$sq1_midi_in"
 
@@ -247,8 +241,8 @@ setup_midi_routing() {
     fi
 
     # Xone routing for Ardour control
-    if [[ "$DAW" == "ardour" && -n "$xonepx5_midi_out" && -n "$midi_thru_in" && -n "$midi_thru_out" ]]; then
-        create_link_with_error_handling "$xonepx5_midi_out" "$midi_thru_in"
+    if [[ "$DAW" == "ardour" && -n "$xonek2_midi_out" && -n "$midi_thru_in" && -n "$midi_thru_out" ]]; then
+        create_link_with_error_handling "$xonek2_midi_out" "$midi_thru_in"
         ardour_midi_control_in=$(find_pw_input_id "MIDI Control in")
         [[ -n "$ardour_midi_control_in" ]] && create_link_with_error_handling "$midi_thru_out" "$ardour_midi_control_in"
     fi
