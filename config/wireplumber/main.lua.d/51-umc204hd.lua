@@ -22,7 +22,7 @@ node_rule = {
   },
   apply_properties = {
     ["audio.rate"] = 48000,
-    ["clock.name"] = "UMC204-clock",
+    ["clock.name"] = "shared-pro-clock",
   },
 }
 
