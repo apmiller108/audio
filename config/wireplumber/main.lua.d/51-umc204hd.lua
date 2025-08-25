@@ -21,9 +21,7 @@ node_rule = {
     }
   },
   apply_properties = {
-    ["audio.rate"] = 48000,
-    ["api.alsa.period-size"] = 512,
-    ["api.alsa.period-num"] = 6,
+    ["audio.rate"] = 48000
   },
 }
 
