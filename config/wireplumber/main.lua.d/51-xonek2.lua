@@ -22,6 +22,7 @@ node_rule = {
   },
   apply_properties = {
     ["audio.rate"] = 48000,
+    ["clock.name"] = "shared-pro-clock",
   },
 }
 

@@ -28,8 +28,8 @@ The scripts in this repository can be used to start and stop the JACK audio serv
 *   `config/pipewire/`: Contains configuration files for PipeWire.
 *   `config/wireplumber/`: Contains configuration files for WirePlumber.
 
-- Symlink the pipewire config files to ~~/.config/pipewire/~
-- Symlink the wireplumber lua scripts to ~~/.config/wireplumber/main.lua.d/~
+- Symlink the pipewire config files to `~/.config/pipewire/`
+- Symlink the wireplumber lua scripts to `~/.config/wireplumber/main.lua.d/`
 
 ### Mixxx
 
