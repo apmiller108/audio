@@ -8,8 +8,8 @@ card_rule = {
   apply_properties = {
     ["device.nick"] = "UMC204HD (customized)",
     ["audio.rate"] = 48000,
-    ["api.alsa.period-size"] = 512,
-    ["api.alsa.period-num"] = 6,
+    ["api.alsa.period-size"] = 256,
+    ["api.alsa.period-num"] = 3,
   },
 }
 
