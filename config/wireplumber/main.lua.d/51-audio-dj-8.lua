@@ -1,3 +1,5 @@
+-- Symlink this file to ~/.config/wireplumber/main.lua.d/ and restart
+-- WirePlumber to apply the custom rules. (see README.md for details)
 -- Rule for the card device
 card_rule = {
   matches = {
