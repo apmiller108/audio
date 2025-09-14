@@ -1,0 +1,12 @@
+# Symlink into /etc/udev/rules.d/
+# Native Instruments Audio 8 DJ
+SUBSYSTEM=="usb", ATTR{idVendor}=="17cc", ATTR{idProduct}=="1978", ATTR{power/autosuspend}="-1"
+
+# Behringer UMC204HD
+SUBSYSTEM=="usb", ATTR{idVendor}=="1397", ATTR{idProduct}=="0508", ATTR{power/autosuspend}="-1"
+
+# Allen & Heath Xone K2 (if needed)
+SUBSYSTEM=="usb", ATTR{idVendor}=="22f0", ATTR{idProduct}=="0001", ATTR{power/autosuspend}="-1"
+
+# Alternative: Disable autosuspend for all audio devices
+SUBSYSTEM=="usb", ATTR{bInterfaceClass}=="01", ATTR{power/autosuspend}="-1"
