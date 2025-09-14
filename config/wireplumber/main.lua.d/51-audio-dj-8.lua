@@ -21,6 +21,7 @@ node_rule = {
   matches = {
     {
       { "node.name", "matches", "alsa_output.usb-Native_Instruments_Audio_8_DJ_SN-KNKYCDU9YU-00*" },
+      { "node.name", "matches", "alsa_input.usb-Native_Instruments_Audio_8_DJ_SN-KNKYCDU9YU-00*" },
     }
   },
   apply_properties = {
