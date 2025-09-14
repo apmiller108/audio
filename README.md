@@ -73,3 +73,28 @@ From https://docs.pipewire.org/page_man_pipewire-props_7.html these two excerpts
 
 ### Mixxx
 *   `mixxx_4_decks_ardour_midi_bindings.map`: A MIDI mapping file for using Mixxx with Ardour.
+
+# TODOs
+- [ ] Disable USB autosuspend for audio interfaces
+`lsub`: list devices. Find vendor and product IDs
+create /etc/udev/rules.d/90-usb-audio-powersave.rules:
+```
+# Native Instruments Audio 8 DJ
+SUBSYSTEM=="usb", ATTR{idVendor}=="17cc", ATTR{idProduct}=="1021", ATTR{power/autosuspend}="-1"
+
+# Behringer UMC204HD
+SUBSYSTEM=="usb", ATTR{idVendor}=="1397", ATTR{idProduct}=="0507", ATTR{power/autosuspend}="-1"
+
+# Native Instruments Xone K2 (if needed)
+SUBSYSTEM=="usb", ATTR{idVendor}=="17cc", ATTR{idProduct}=="1340", ATTR{power/autosuspend}="-1"
+
+# Alternative: Disable autosuspend for all audio devices
+SUBSYSTEM=="usb", ATTR{bInterfaceClass}=="01", ATTR{power/autosuspend}="-1"
+```
+- [ ] Add my user to audio group
+- [ ] configure /etc/security/limits.conf
+
+```
+@audio - rtprio 95
+@audio - memlock unlimited
+```

@@ -11,7 +11,8 @@ card_rule = {
     ["device.nick"] = "UMC204HD (customized)",
     ["audio.rate"] = 48000,
     ["api.alsa.period-size"] = 256,
-    ["api.alsa.period-num"] = 3,
+    ["api.alsa.period-num"] = 0, -- PipeWire automatically choses
+    ["api.alsa.headroom"] = 512,
   },
 }
 
