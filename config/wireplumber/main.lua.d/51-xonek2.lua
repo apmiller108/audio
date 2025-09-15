@@ -10,9 +10,9 @@ card_rule = {
   apply_properties = {
     ["device.nick"] = "XONE:K2 (customized)",
     ["audio.rate"] = 48000,
-    ["api.alsa.period-size"] = 256,
+    ["api.alsa.period-size"] = 512,
     ["api.alsa.period-num"] = 0, -- PipeWire automatically choses
-    ["api.alsa.headroom"] = 512,
+    ["api.alsa.headroom"] = 1024,
   },
 }
 

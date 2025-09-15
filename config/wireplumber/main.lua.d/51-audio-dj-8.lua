@@ -10,9 +10,9 @@ card_rule = {
   apply_properties = {
     ["device.nick"] = "Audio 8 DJ (customized)",
     ["audio.rate"] = 48000,
-    ["api.alsa.period-size"] = 256,
+    ["api.alsa.period-size"] = 512,
     ["api.alsa.period-num"] = 0, -- PipeWire automatically choses
-    ["api.alsa.headroom"] = 512,
+    ["api.alsa.headroom"] = 1024,
   },
 }
 
@@ -21,6 +21,8 @@ node_rule = {
   matches = {
     {
       { "node.name", "matches", "alsa_output.usb-Native_Instruments_Audio_8_DJ_SN-KNKYCDU9YU-00*" },
+    },
+    {
       { "node.name", "matches", "alsa_input.usb-Native_Instruments_Audio_8_DJ_SN-KNKYCDU9YU-00*" },
     }
   },

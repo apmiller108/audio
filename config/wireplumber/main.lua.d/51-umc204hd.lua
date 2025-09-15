@@ -10,9 +10,9 @@ card_rule = {
   apply_properties = {
     ["device.nick"] = "UMC204HD (customized)",
     ["audio.rate"] = 48000,
-    ["api.alsa.period-size"] = 256,
+    ["api.alsa.period-size"] = 512,
     ["api.alsa.period-num"] = 0, -- PipeWire automatically choses
-    ["api.alsa.headroom"] = 512,
+    ["api.alsa.headroom"] = 1024,
   },
 }
 
@@ -21,6 +21,9 @@ node_rule = {
   matches = {
     {
       { "node.name", "matches", "alsa_output.usb-BEHRINGER_UMC204HD_192k-00*" },
+    },
+    {
+      { "node.name", "matches", "alsa_input.usb-BEHRINGER_UMC204HD_192k-00*" },
     }
   },
   apply_properties = {
