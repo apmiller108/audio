@@ -13,6 +13,7 @@
 DAW=""
 RECORD=""
 SHOW_INFO=false
+FORCE=false
 
 # Configuration paths
 BITWIG_PROJECT="/home/apmiller/Bitwig Studio/Projects/pmixxx/pmixxx.bwproject"
@@ -39,6 +40,7 @@ Options:
     --ardour        Use Ardour as the DAW
     --bitwig        Use Bitwig as the DAW
     --info          Show MIDI device information and exit
+    -f, --force     Force start even if checks fail
     -r PROJECT      Start recording project
     -h, --help      Show this help message
 
@@ -57,6 +59,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         --info)
             SHOW_INFO=true
+            shift
+            ;;
+        -f|--force)
+            FORCE=true
             shift
             ;;
         -r)
@@ -257,6 +263,11 @@ start_recording() {
 
 # Main execution
 main() {
+    if pgrep -x "chrome" > /dev/null && [[ "$FORCE" == false ]]; then
+        echo "⚠️ close chrome first"
+        exit 1
+    fi
+
     system76-power profile performance
 
     if [[ "$SHOW_INFO" == true ]]; then
