@@ -11,7 +11,6 @@
 
 # Default configuration
 DAW=""
-RECORD=""
 SHOW_INFO=false
 FORCE=false
 
@@ -64,10 +63,6 @@ while [[ $# -gt 0 ]]; do
         -f|--force)
             FORCE=true
             shift
-            ;;
-        -r)
-            RECORD="$2"
-            shift 2
             ;;
         -h|--help)
             usage
@@ -254,13 +249,6 @@ setup_midi_routing() {
     fi
 }
 
-start_recording() {
-    if [[ -n "$RECORD" ]]; then
-        echo "Starting recording project..."
-        Ardour7 "$RECORDING_PROJECT" &
-    fi
-}
-
 # Main execution
 main() {
     if pgrep -x "chrome" > /dev/null && [[ "$FORCE" == false ]]; then
@@ -317,9 +305,6 @@ main() {
 
     # Setup MIDI routing
     setup_midi_routing
-
-    # Start recording if requested
-    start_recording
 
     echo "DJ setup complete!"
 }
