@@ -214,7 +214,7 @@ setup_midi_routing() {
 # Main execution
 main() {
     if pgrep -x "chrome" > /dev/null && [[ "$FORCE" == false ]]; then
-        echo "⚠️ close chrome first"
+        echo "⚠️ Close chrome first. Use --force to override."
         exit 1
     fi
 
@@ -228,12 +228,8 @@ main() {
 
     # Validate DAW selection
     if [[ -z "$DAW" ]]; then
-        echo "Error: Please specify a DAW with --bitwig" >&2
-        usage
-        exit 1
+        echo "Starting DJ setup without DAW"
     fi
-
-    echo "Starting DJ setup with $DAW..."
 
     # Setup virtual MIDI
     setup_virtual_midi
@@ -241,6 +237,7 @@ main() {
     # Start DAW
     case "$DAW" in
         "bitwig")
+            echo "Starting DJ setup with $DAW..."
             start_bitwig
             ;;
     esac
