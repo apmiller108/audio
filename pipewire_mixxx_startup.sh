@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
 # This is a pipewire based setup script to run Mixxx DJ software using 4 decks
-# "piped" through Ardour or Bitwig audio channels. From there the audio is sent
-# out an external mixer. MIDI control and MIDI clock are included as well.
-# Recording is supported by routing the master or record channels from external
-# mixer to whatever recording software via audio interface.
+# "piped" Bitwig audio channels. From there the audio is sent out an external
+# mixer. MIDI control and MIDI clock are included as well. Recording is
+# supported by routing the master or record channels from external mixer to
+# whatever recording software via audio interface.
 
 # In the event the volume is very low on a soundcard, use alsamixer or
 # pavucontrol (Pulse Audio Volume Control) to set sound card volume levels.
@@ -16,8 +16,6 @@ FORCE=false
 
 # Configuration paths
 BITWIG_PROJECT="/home/apmiller/Bitwig Studio/Projects/pmixxx/pmixxx.bwproject"
-ARDOUR_PROJECT="/home/apmiller/mixxx_4_decks_v2"
-RECORDING_PROJECT="/home/apmiller/Recording"
 
 # Device configuration - add your devices here
 declare -A MIDI_DEVICES=(
@@ -36,7 +34,6 @@ usage() {
 Usage: $0 [OPTIONS]
 
 Options:
-    --ardour        Use Ardour as the DAW
     --bitwig        Use Bitwig as the DAW
     --info          Show MIDI device information and exit
     -f, --force     Force start even if checks fail
@@ -48,10 +45,6 @@ EOF
 
 while [[ $# -gt 0 ]]; do
     case $1 in
-        --ardour)
-            DAW="ardour"
-            shift
-            ;;
         --bitwig)
             DAW="bitwig"
             shift
@@ -162,13 +155,6 @@ start_bitwig() {
     sleep 15
 }
 
-start_ardour() {
-    echo "Starting Ardour..."
-    Ardour7 "$ARDOUR_PROJECT" &
-    echo "Waiting for Ardour to load..."
-    sleep 15
-}
-
 start_mixxx() {
     echo "Starting Mixxx..."
     mixxx &
@@ -201,18 +187,6 @@ setup_bitwig_audio_routing() {
     create_link_with_error_handling "Mixxx:out_7" "Bitwig Studio:Mixxx D4_R"
 }
 
-setup_ardour_audio_routing() {
-    echo "Setting up Ardour audio routing..."
-    create_link_with_error_handling "Mixxx:out_0" "ardour:Deck1/audio_in 1"
-    create_link_with_error_handling "Mixxx:out_1" "ardour:Deck1/audio_in 2"
-    create_link_with_error_handling "Mixxx:out_2" "ardour:Deck2/audio_in 1"
-    create_link_with_error_handling "Mixxx:out_3" "ardour:Deck2/audio_in 2"
-    create_link_with_error_handling "Mixxx:out_4" "ardour:Deck3/audio_in 1"
-    create_link_with_error_handling "Mixxx:out_5" "ardour:Deck3/audio_in 2"
-    create_link_with_error_handling "Mixxx:out_6" "ardour:Deck4/audio_in 1"
-    create_link_with_error_handling "Mixxx:out_7" "ardour:Deck4/audio_in 2"
-}
-
 setup_midi_routing() {
     echo "Setting up MIDI routing..."
 
@@ -234,18 +208,6 @@ setup_midi_routing() {
     if [[ -n "$mixxx_midi_clock_out" ]]; then
         [[ -n "$dj_8_midi_in" ]] && create_link_with_error_handling "$mixxx_midi_clock_out" "$dj_8_midi_in"
         [[ -n "$sq1_midi_in" ]] && create_link_with_error_handling "$mixxx_midi_clock_out" "$sq1_midi_in"
-
-        if [[ "$DAW" == "ardour" ]]; then
-            ardour_midi_clock_in=$(find_pw_input_id "MIDI Clock in")
-            [[ -n "$ardour_midi_clock_in" ]] && create_link_with_error_handling "$mixxx_midi_clock_out" "$ardour_midi_clock_in"
-        fi
-    fi
-
-    # Xone routing for Ardour control
-    if [[ "$DAW" == "ardour" && -n "$xonek2_midi_out" && -n "$midi_thru_in" && -n "$midi_thru_out" ]]; then
-        create_link_with_error_handling "$xonek2_midi_out" "$midi_thru_in"
-        ardour_midi_control_in=$(find_pw_input_id "MIDI Control in")
-        [[ -n "$ardour_midi_control_in" ]] && create_link_with_error_handling "$midi_thru_out" "$ardour_midi_control_in"
     fi
 }
 
@@ -266,7 +228,7 @@ main() {
 
     # Validate DAW selection
     if [[ -z "$DAW" ]]; then
-        echo "Error: Please specify a DAW with --ardour or --bitwig" >&2
+        echo "Error: Please specify a DAW with --bitwig" >&2
         usage
         exit 1
     fi
@@ -281,10 +243,6 @@ main() {
         "bitwig")
             start_bitwig
             ;;
-        "ardour")
-            # start_ardour
-            echo "Start Ardour before running this script..."
-            ;;
     esac
 
     # Start Mixxx
@@ -297,9 +255,6 @@ main() {
     case "$DAW" in
         "bitwig")
             setup_bitwig_audio_routing
-            ;;
-        "ardour")
-            setup_ardour_audio_routing
             ;;
     esac
 
