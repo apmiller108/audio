@@ -37,7 +37,6 @@ Options:
     --bitwig        Use Bitwig as the DAW
     --info          Show MIDI device information and exit
     -f, --force     Force start even if checks fail
-    -r PROJECT      Start recording project
     -h, --help      Show this help message
 
 EOF
