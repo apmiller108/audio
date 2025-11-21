@@ -176,7 +176,7 @@ start_recording_tools() {
 
     # Start OBS
     echo "Starting OBS..."
-    obs &
+    flatpak run com.obsproject.Studio &
 
     echo "Waiting for recording tools to load..."
     sleep 5
