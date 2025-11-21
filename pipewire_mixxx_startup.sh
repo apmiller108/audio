@@ -13,6 +13,7 @@
 DAW=""
 SHOW_INFO=false
 FORCE=false
+RECORD=false
 
 # Configuration paths
 BITWIG_PROJECT="/home/apmiller/Bitwig Studio/Projects/pmixxx/pmixxx.bwproject"
@@ -36,6 +37,7 @@ Usage: $0 [OPTIONS]
 Options:
     --bitwig        Use Bitwig as the DAW
     --info          Show MIDI device information and exit
+    -r, --record    Enable recording mode (starts projectMSDL and OBS)
     -f, --force     Force start even if checks fail
     -h, --help      Show this help message
 
@@ -50,6 +52,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         --info)
             SHOW_INFO=true
+            shift
+            ;;
+        -r|--record)
+            RECORD=true
             shift
             ;;
         -f|--force)
@@ -161,6 +167,21 @@ start_mixxx() {
     sleep 10
 }
 
+start_recording_tools() {
+    echo "Starting recording tools..."
+
+    # Start projectMSDL
+    echo "Starting projectMSDL..."
+    projectMSDL &
+
+    # Start OBS
+    echo "Starting OBS..."
+    obs &
+
+    echo "Waiting for recording tools to load..."
+    sleep 5
+}
+
 create_link_with_error_handling() {
   local source="$1"
   local target="$2"
@@ -184,6 +205,19 @@ setup_bitwig_audio_routing() {
     create_link_with_error_handling "Mixxx:out_5" "Bitwig Studio:Mixxx D3_R"
     create_link_with_error_handling "Mixxx:out_6" "Bitwig Studio:Mixxx D4_L"
     create_link_with_error_handling "Mixxx:out_7" "Bitwig Studio:Mixxx D4_R"
+}
+
+setup_projectmsdl_audio_routing() {
+  echo "Setting up projectMSDL audio routing..."
+
+  # Connect UMC204HD audio inputs to projectMSDL
+  create_link_with_error_handling \
+    "alsa_input.usb-BEHRINGER_UMC204HD_192k-00.Direct__hw_U192k__source:capture_FL" \
+    "projectMSDL:input_FL"
+
+  create_link_with_error_handling \
+    "alsa_input.usb-BEHRINGER_UMC204HD_192k-00.Direct__hw_U192k__source:capture_FR" \
+    "projectMSDL:input_FR"
 }
 
 setup_midi_routing() {
@@ -244,6 +278,11 @@ main() {
     # Start Mixxx
     start_mixxx
 
+    # Start recording tools if --record flag is set
+    if [[ "$RECORD" == true ]]; then
+        start_recording_tools
+    fi
+
     # Get device IDs
     get_device_ids
 
@@ -254,10 +293,18 @@ main() {
             ;;
     esac
 
+    # Setup projectMSDL audio routing if recording
+    if [[ "$RECORD" == true ]]; then
+      setup_projectmsdl_audio_routing
+    fi
+
     # Setup MIDI routing
     setup_midi_routing
 
     echo "DJ setup complete!"
+    if [[ "$RECORD" == true ]]; then
+        echo "Recording mode enabled - projectMSDL and OBS are running"
+    fi
 }
 
 # Run main function
