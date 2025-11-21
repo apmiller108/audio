@@ -1,0 +1,2 @@
+Normalize:PeakLevel="-3.0" RemoveDcOffset="0" ApplyGain="1" StereoIndependent="0"
+Limiter:Type="HardLimit" Gain="2.0" Thresh="-1.0" Hold="10" Makeup="1"

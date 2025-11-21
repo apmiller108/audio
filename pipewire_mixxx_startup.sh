@@ -283,6 +283,16 @@ main() {
         start_recording_tools
     fi
 
+    if [[ -z "$DAW" ]]; then
+        # Assume setting up Mixxx outputs directly to Audio DJ 8. For some
+        # reason the D output does not show up in Mixxx UI, so we link manually
+        # here.
+        pw-link -d "Mixxx:out_4" "alsa_output.usb-BEHRINGER_UMC204HD_192k-00.Direct__hw_U192k__sink:playback_FL"
+        pw-link -d "Mixxx:out_5" "alsa_output.usb-BEHRINGER_UMC204HD_192k-00.Direct__hw_U192k__sink:playback_FR"
+        pw-link "Mixxx:out_4" "alsa_output.usb-Native_Instruments_Audio_8_DJ_SN-KNKYCDU9YU-00.analog-stereo-d-output:playback_FL"
+        pw-link "Mixxx:out_5" "alsa_output.usb-Native_Instruments_Audio_8_DJ_SN-KNKYCDU9YU-00.analog-stereo-d-output:playback_FR"
+    fi
+
     # Get device IDs
     get_device_ids
 
