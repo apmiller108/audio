@@ -26,7 +26,7 @@ require 'shellwords'
 def check_dependencies
   missing = []
   missing << "ffmpeg" unless system("which ffmpeg > /dev/null 2>&1")
-  missing << "gem install taglib-ruby" unless check_gem('taglib')
+  missing << "gem install taglib-ruby or gem install taglib-ruby --version '< 2'" unless check_gem('taglib')
 
   unless missing.empty?
     puts "Error: Missing dependencies:"
