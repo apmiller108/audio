@@ -19,6 +19,7 @@ RECORD=false
 BITWIG_PROJECT="/home/apmiller/Bitwig Studio/Projects/pmixxx/pmixxx.bwproject"
 
 # Device configuration - add your devices here
+# Maps device friendly names to search patterns used in pw-link to find device IDs.
 declare -A MIDI_DEVICES=(
     ["Midi Fighter"]="Midi Fighter"
     ["K2 MIDI"]="K2 MIDI"
@@ -27,6 +28,7 @@ declare -A MIDI_DEVICES=(
     ["Arduino Leonardo"]="Arduino Leonardo MIDI"
     ["SQ-1"]="SQ-1.+CTRL"
     ["Audio 8 DJ"]="Midi.+Audio\s8\sDJ"
+    ["Raster"]="Raster MIDI"
 )
 
 # Parse command line arguments
@@ -145,6 +147,7 @@ get_device_ids() {
     sq1_midi_in=$(find_pw_input_id "${MIDI_DEVICES["SQ-1"]}")
     dj_8_midi_out=$(find_pw_output_id "${MIDI_DEVICES["Audio 8 DJ"]}")
     dj_8_midi_in=$(find_pw_input_id "${MIDI_DEVICES["Audio 8 DJ"]}")
+    raster_midi_in=$(find_pw_input_id "${MIDI_DEVICES["Raster"]}")
 
     # Virtual MIDI devices
     virtual_midi_in0=$(find_pw_input_id "VirMIDI\s+.+-0")
@@ -241,6 +244,7 @@ setup_midi_routing() {
     if [[ -n "$mixxx_midi_clock_out" ]]; then
         [[ -n "$dj_8_midi_in" ]] && create_link_with_error_handling "$mixxx_midi_clock_out" "$dj_8_midi_in"
         [[ -n "$sq1_midi_in" ]] && create_link_with_error_handling "$mixxx_midi_clock_out" "$sq1_midi_in"
+        [[ -n "$raster_midi_in" ]] && create_link_with_error_handling "$mixxx_midi_clock_out" "$raster_midi_in"
     fi
 }
 
