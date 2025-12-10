@@ -239,6 +239,8 @@ setup_midi_routing() {
         create_link_with_error_handling "$midi_fighter_out" "$midi_thru_in"
     [[ -n "$midi_fighter_out" && -n "$dj_8_midi_in" ]] && \
         create_link_with_error_handling "$midi_fighter_out" "$dj_8_midi_in"
+    [[ -n "$midi_fighter_out" && -n "$raster_midi_in" ]] && \
+        create_link_with_error_handling "$midi_fighter_out" "$raster_midi_in"
 
     # MIDI Clock routing
     if [[ -n "$mixxx_midi_clock_out" ]]; then
