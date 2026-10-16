@@ -1,22 +1,18 @@
 #!/usr/bin/env bash
 
 # This is a pipewire based setup script to run Mixxx DJ software using 4 decks
-# "piped" Bitwig audio channels. From there the audio is sent out an external
-# mixer. MIDI control and MIDI clock are included as well. Recording is
-# supported by routing the master or record channels from external mixer to
-# whatever recording software via audio interface.
+# routed directly out to an external mixer. MIDI control and MIDI clock are
+# included as well. Recording is supported by routing the master or record
+# channels from external mixer to whatever recording software via audio
+# interface.
 
 # In the event the volume is very low on a soundcard, use alsamixer or
 # pavucontrol (Pulse Audio Volume Control) to set sound card volume levels.
 
 # Default configuration
-DAW=""
 SHOW_INFO=false
 FORCE=false
 RECORD=false
-
-# Configuration paths
-BITWIG_PROJECT="/home/apmiller/Bitwig Studio/Projects/pmixxx/pmixxx.bwproject"
 
 # Device configuration - add your devices here
 # Maps device friendly names to search patterns used in pw-link to find device IDs.
@@ -37,7 +33,6 @@ usage() {
 Usage: $0 [OPTIONS]
 
 Options:
-    --bitwig        Use Bitwig as the DAW
     --info          Show MIDI device information and exit
     -r, --record    Enable recording mode (starts projectMSDL and OBS)
     -f, --force     Force start even if checks fail
@@ -48,10 +43,6 @@ EOF
 
 while [[ $# -gt 0 ]]; do
     case $1 in
-        --bitwig)
-            DAW="bitwig"
-            shift
-            ;;
         --info)
             SHOW_INFO=true
             shift
@@ -156,13 +147,6 @@ get_device_ids() {
     virtual_midi_in3=$(find_pw_input_id "VirMIDI\s+.+-3")
 }
 
-start_bitwig() {
-    echo "Starting Bitwig Studio..."
-    bitwig-studio "$BITWIG_PROJECT" &
-    echo "Waiting for Bitwig to load..."
-    sleep 15
-}
-
 start_mixxx() {
     echo "Starting Mixxx..."
     mixxx &
@@ -198,18 +182,6 @@ create_link_with_error_handling() {
   fi
 }
 
-setup_bitwig_audio_routing() {
-    echo "Setting up Bitwig audio routing..."
-    create_link_with_error_handling "Mixxx:out_0" "Bitwig Studio:Mixxx D1_L"
-    create_link_with_error_handling "Mixxx:out_1" "Bitwig Studio:Mixxx D1_R"
-    create_link_with_error_handling "Mixxx:out_2" "Bitwig Studio:Mixxx D2_L"
-    create_link_with_error_handling "Mixxx:out_3" "Bitwig Studio:Mixxx D2_R"
-    create_link_with_error_handling "Mixxx:out_4" "Bitwig Studio:Mixxx D3_L"
-    create_link_with_error_handling "Mixxx:out_5" "Bitwig Studio:Mixxx D3_R"
-    create_link_with_error_handling "Mixxx:out_6" "Bitwig Studio:Mixxx D4_L"
-    create_link_with_error_handling "Mixxx:out_7" "Bitwig Studio:Mixxx D4_R"
-}
-
 setup_projectmsdl_audio_routing() {
   echo "Setting up projectMSDL audio routing..."
 
@@ -226,7 +198,7 @@ setup_projectmsdl_audio_routing() {
 setup_midi_routing() {
     echo "Setting up MIDI routing..."
 
-    # Virtual MIDI routing for DAW
+    # Virtual MIDI routing
     [[ -n "$virtual_midi_in0" && -n "$mixxx_midi_clock_out" ]] && \
         create_link_with_error_handling "$mixxx_midi_clock_out" "$virtual_midi_in0"
     [[ -n "$virtual_midi_in1" && -n "$xonek2_midi_out" ]] && \
@@ -265,21 +237,10 @@ main() {
         exit 0
     fi
 
-    # Validate DAW selection
-    if [[ -z "$DAW" ]]; then
-        echo "Starting DJ setup without DAW"
-    fi
+    echo "Starting DJ setup..."
 
     # Setup virtual MIDI
     setup_virtual_midi
-
-    # Start DAW
-    case "$DAW" in
-        "bitwig")
-            echo "Starting DJ setup with $DAW..."
-            start_bitwig
-            ;;
-    esac
 
     # Start Mixxx
     start_mixxx
@@ -289,25 +250,15 @@ main() {
         start_recording_tools
     fi
 
-    if [[ -z "$DAW" ]]; then
-        # Assume setting up Mixxx outputs directly to Audio DJ 8. For some
-        # reason the D output does not show up in Mixxx UI, so we link manually
-        # here.
-        pw-link -d "Mixxx:out_4" "alsa_output.usb-BEHRINGER_UMC204HD_192k-00.Direct__hw_U192k__sink:playback_FL"
-        pw-link -d "Mixxx:out_5" "alsa_output.usb-BEHRINGER_UMC204HD_192k-00.Direct__hw_U192k__sink:playback_FR"
-        pw-link "Mixxx:out_4" "alsa_output.usb-Native_Instruments_Audio_8_DJ_SN-KNKYCDU9YU-00.analog-stereo-d-output:playback_FL"
-        pw-link "Mixxx:out_5" "alsa_output.usb-Native_Instruments_Audio_8_DJ_SN-KNKYCDU9YU-00.analog-stereo-d-output:playback_FR"
-    fi
+    # Mixxx outputs go directly to the Audio DJ 8. For some reason the D output
+    # does not show up in Mixxx UI, so we link manually here.
+    pw-link -d "Mixxx:out_4" "alsa_output.usb-BEHRINGER_UMC204HD_192k-00.Direct__hw_U192k__sink:playback_FL"
+    pw-link -d "Mixxx:out_5" "alsa_output.usb-BEHRINGER_UMC204HD_192k-00.Direct__hw_U192k__sink:playback_FR"
+    pw-link "Mixxx:out_4" "alsa_output.usb-Native_Instruments_Audio_8_DJ_SN-KNKYCDU9YU-00.analog-stereo-d-output:playback_FL"
+    pw-link "Mixxx:out_5" "alsa_output.usb-Native_Instruments_Audio_8_DJ_SN-KNKYCDU9YU-00.analog-stereo-d-output:playback_FR"
 
     # Get device IDs
     get_device_ids
-
-    # Setup audio routing
-    case "$DAW" in
-        "bitwig")
-            setup_bitwig_audio_routing
-            ;;
-    esac
 
     # Setup projectMSDL audio routing if recording
     if [[ "$RECORD" == true ]]; then

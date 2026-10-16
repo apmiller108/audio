@@ -1,26 +1,18 @@
 # Audio Production Environment Scripts
 
-This repository contains a collection of scripts and configuration files for setting up and managing an audio production environment on Linux. The scripts are designed to work with JACK, PipeWire, Mixxx, and Ardour.
+This repository contains a collection of scripts and configuration files for setting up and managing an audio production environment on Linux. The scripts are designed to work with PipeWire and Mixxx.
 
 ## Prerequisites
 
 Before using these scripts, you will need to have the following software installed:
 
-*   [JACK Audio Connection Kit](https://jackaudio.org/)
 *   [PipeWire](https://pipewire.org/)
 *   [Mixxx](https://mixxx.org/)
-*   [Ardour](https://ardour.org/)
 *   [WirePlumber](https://pipewire.pages.freedesktop.org/wireplumber/)
 
 ## Usage
 
-The scripts in this repository can be used to start and stop the JACK audio server, manage JACK connections, and launch Mixxx and Ardour with specific configurations.
-
-### JACK
-
-*   `jack_startup.sh`: Starts the JACK audio server.
-*   `jack_shutdown.sh`: Stops the JACK audio server.
-*   `jack_connections.sh`: A script for managing JACK connections. (The user will need to fill in the details of how this script works).
+The scripts in this repository can be used to launch Mixxx and wire up its audio and MIDI routing with specific configurations.
 
 ### PipeWire
 
@@ -39,7 +31,7 @@ various audio interfaces such as Behringer UMC204, Allen & Heath Xone:K2 and the
 Native Instruments Audio DJ 8.
 
 This is the issue I had when using two audio interfaces at the same time (the
-outputs) with Bitwig: One of them would have the dredded pops and clicks. I'm
+outputs): One of them would have the dredded pops and clicks. I'm
 not entirely sure why this happened, but after experimenting with various
 settings, I found that setting the `clock.name` property to the same value for
 both devices resolved the issue.
@@ -70,9 +62,6 @@ From https://docs.pipewire.org/page_man_pipewire-props_7.html these two excerpts
 - `pw-top`: to monitor PipeWire activity
 - `pactl list`: to list PulseAudio (PipeWire) sinks and sources
 - `systemctl --user restart pipewire pipewire-pulse wireplumber`: to restart PipeWire and WirePlumber services
-
-### Mixxx
-*   `mixxx_4_decks_ardour_midi_bindings.map`: A MIDI mapping file for using Mixxx with Ardour.
 
 # TODOs
 - [x] Disable USB autosuspend for audio interfaces
