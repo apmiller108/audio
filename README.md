@@ -87,3 +87,32 @@ SUBSYSTEM=="usb", ATTR{bInterfaceClass}=="01", ATTR{power/autosuspend}="-1"
 @audio - rtprio 95
 @audio - memlock unlimited
 ```
+
+## Replacing Bandcamp MP3s with FLAC
+
+`bandcamp-flac-migrate.py` swaps the Bandcamp MP3s in `~/Music` for FLACs
+downloaded by [bandcampsync](https://pypi.org/project/bandcampsync), keeping
+each Mixxx track's id so play history, playlists, crates and ratings survive.
+The Mixxx DB is the source of truth for tags. Hidden tracks are never touched.
+
+1. Install bandcampsync (once):
+   `python3 -m venv ~/.local/share/venvs/bandcampsync && ~/.local/share/venvs/bandcampsync/bin/pip install bandcampsync`
+2. Save the `identity` cookie from bandcamp.com as `identity=<value>` in
+   `~/.config/bandcampsync/cookies.txt` (`chmod 600` it).
+3. Download into a staging folder outside `~/Music`:
+   `~/.local/share/venvs/bandcampsync/bin/bandcampsync -c ~/.config/bandcampsync/cookies.txt -d ~/Bandcamp_FLAC -f flac`
+4. Dry run, then read the report (`~/bandcamp-migration-<date>.tsv`):
+   `./bandcamp-flac-migrate.py`
+   MP3s whose names drifted from Bandcamp's (renamed files, relabelled
+   releases) can be paired by hand in a `mp3<TAB>flac` file passed with
+   `--pairs ~/bandcamp-pairs.tsv`.
+5. Close Mixxx, then migrate (try `--limit 5` first):
+   `./bandcamp-flac-migrate.py --apply`
+6. In Mixxx, open the **Bandcamp FLAC migrated** crate, select all, and use
+   **Analyze → Analyze** to rebuild beatgrids and waveforms. BPM-locked grids
+   are kept (rescaled if the sample rate changed) and are skipped by analysis.
+
+MP3s go to `~/Bandcamp_MP3s_archive` (same relative paths) with a
+`manifest.tsv` of every swap. To roll back: close Mixxx, restore
+`~/.mixxx/mixxxdb.sqlite.pre-flac-<timestamp>`, then for each manifest row move
+the archived MP3 back and delete the FLAC.
