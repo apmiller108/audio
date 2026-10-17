@@ -116,3 +116,23 @@ MP3s go to `~/Bandcamp_MP3s_archive` (same relative paths) with a
 `manifest.tsv` of every swap. To roll back: close Mixxx, restore
 `~/.mixxx/mixxxdb.sqlite.pre-flac-<timestamp>`, then for each manifest row move
 the archived MP3 back and delete the FLAC.
+
+### Later syncs
+
+bandcampsync tells what it has downloaded from the folders in
+`~/Bandcamp_FLAC`. To delete the staging folder without redownloading
+everything, record the downloaded purchases in an ignore file first (one
+`<item id>  # band / title` per line, taken from each folder's
+`bandcamp_item_id.txt`) at `~/.config/bandcampsync/ignores.txt`. Then sync with:
+
+```
+~/.local/share/venvs/bandcampsync/bin/bandcampsync -c ~/.config/bandcampsync/cookies.txt \
+  -d ~/Bandcamp_FLAC -f flac \
+  -I ~/.config/bandcampsync/ignores.txt --skip-item-index
+```
+
+`--skip-item-index` relies on the ignore file alone, and new downloads are added
+to it. Keep the file: if it's missing, bandcampsync tries to copy a template
+that only exists in its Docker image and fails. Add `--dry-run` to check what
+would download. New FLACs land in `~/Bandcamp_FLAC`; copy them into `~/Music`
+and use **Library → Rescan Library** in Mixxx.
