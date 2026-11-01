@@ -16,15 +16,16 @@ RECORD=false
 
 # Device configuration - add your devices here
 # Maps device friendly names to search patterns used in pw-link to find device IDs.
+# Newer PipeWire names MIDI ports "Device: MIDI 1" (older: "Device MIDI 1"), hence ":?".
 declare -A MIDI_DEVICES=(
     ["Midi Fighter"]="Midi Fighter"
-    ["K2 MIDI"]="K2 MIDI"
-    ["UMC204HD"]="UMC204HD 192k MIDI"
+    ["K2 MIDI"]="K2:? MIDI"
+    ["UMC204HD"]="UMC204HD 192k:? MIDI"
     ["Midi Through"]="Midi Through"
-    ["Arduino Leonardo"]="Arduino Leonardo MIDI"
+    ["Arduino Leonardo"]="Arduino Leonardo:? MIDI"
     ["SQ-1"]="SQ-1.+CTRL"
     ["Audio 8 DJ"]="Midi.+Audio\s8\sDJ"
-    ["Raster"]="Raster MIDI"
+    ["Raster"]="Raster:? MIDI"
 )
 
 # Parse command line arguments
@@ -185,13 +186,15 @@ create_link_with_error_handling() {
 setup_projectmsdl_audio_routing() {
   echo "Setting up projectMSDL audio routing..."
 
-  # Connect UMC204HD audio inputs to projectMSDL
+  # Connect UMC204HD audio inputs to projectMSDL. The node name depends on the
+  # card profile, so look the ports up instead of hard coding them.
+  local umc204_capture="alsa_input\.usb-BEHRINGER_UMC204HD_192k-00\.[^:]+:capture_"
   create_link_with_error_handling \
-    "alsa_input.usb-BEHRINGER_UMC204HD_192k-00.Direct__hw_U192k__source:capture_FL" \
+    "$(find_pw_output_id "${umc204_capture}FL")" \
     "projectMSDL:input_FL"
 
   create_link_with_error_handling \
-    "alsa_input.usb-BEHRINGER_UMC204HD_192k-00.Direct__hw_U192k__source:capture_FR" \
+    "$(find_pw_output_id "${umc204_capture}FR")" \
     "projectMSDL:input_FR"
 }
 
@@ -250,12 +253,9 @@ main() {
         start_recording_tools
     fi
 
-    # Mixxx outputs go directly to the Audio DJ 8. For some reason the D output
-    # does not show up in Mixxx UI, so we link manually here.
-    pw-link -d "Mixxx:out_4" "alsa_output.usb-BEHRINGER_UMC204HD_192k-00.Direct__hw_U192k__sink:playback_FL"
-    pw-link -d "Mixxx:out_5" "alsa_output.usb-BEHRINGER_UMC204HD_192k-00.Direct__hw_U192k__sink:playback_FR"
-    pw-link "Mixxx:out_4" "alsa_output.usb-Native_Instruments_Audio_8_DJ_SN-KNKYCDU9YU-00.analog-stereo-d-output:playback_FL"
-    pw-link "Mixxx:out_5" "alsa_output.usb-Native_Instruments_Audio_8_DJ_SN-KNKYCDU9YU-00.analog-stereo-d-output:playback_FR"
+    # Mixxx outputs go directly to the Audio 8 DJ (A, B, C, D), configured in
+    # Mixxx preferences. Channel D only shows up in Mixxx thanks to the rename
+    # in config/wireplumber/wireplumber.conf.d/51-audio-dj-8.conf.
 
     # Get device IDs
     get_device_ids

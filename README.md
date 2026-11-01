@@ -18,17 +18,25 @@ The scripts in this repository can be used to launch Mixxx and wire up its audio
 
 *   `pipewire_mixxx_startup.sh`: Starts Mixxx with PipeWire.
 *   `config/pipewire/`: Contains configuration files for PipeWire.
-*   `config/wireplumber/`: Contains configuration files for WirePlumber. Lua scripts to configure various audio interfaces so they can work together.
+*   `config/wireplumber/`: Contains configuration files for WirePlumber (0.5+ `.conf` format) to configure various audio interfaces so they can work together.
 
 - Symlink the pipewire config files to `~/.config/pipewire/`
-- Symlink the wireplumber lua scripts to `~/.config/wireplumber/main.lua.d/`
+- Symlink the wireplumber conf files to `~/.config/wireplumber/wireplumber.conf.d/`
 
-#### A note about the Lua scripts
-The Lua scripts in the `config/wireplumber/` directory are used to configure
+#### A note about the WirePlumber configs
+WirePlumber 0.5 ignores the old `main.lua.d/*.lua` scripts, so these are
+`monitor.alsa.rules` in `wireplumber.conf.d/*.conf`. The configs in the
+`config/wireplumber/` directory are used to configure
 WirePlumber to manage audio devices and nodes (streams) and their properties
 (eg, latency, sample rate, etc). The provided scripts include configurations for
 various audio interfaces such as Behringer UMC204, Allen & Heath Xone:K2 and the
 Native Instruments Audio DJ 8.
+
+The Audio 8 DJ config also renames channel D's output node to drop
+"(Headphones)" from its description. PipeWire's JACK layer uses the description
+as the JACK client name and Mixxx's PortAudio can't find ports for a client with
+parentheses in its name, so without the rename channel D is missing from Mixxx's
+sound preferences.
 
 This is the issue I had when using two audio interfaces at the same time (the
 outputs): One of them would have the dredded pops and clicks. I'm
